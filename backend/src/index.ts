@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { PrismaClient } from '@prisma/client';
+import authRoutes from './routes/authRoutes';
 
 dotenv.config();
 
@@ -12,6 +13,9 @@ const PORT = process.env.PORT || 4000;
 // Middlewares
 app.use(cors());
 app.use(express.json());
+
+// Rutas de la API
+app.use('/api/auth', authRoutes);
 
 // Ruta base
 app.get('/', (req: Request, res: Response) => {
