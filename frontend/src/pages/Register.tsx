@@ -76,6 +76,10 @@ const Register: React.FC = () => {
                   name="name"
                   type="text"
                   required
+                  minLength={3}
+                  maxLength={50}
+                  pattern="^[A-Za-zÁ-Úá-úñÑ\s]+$"
+                  title="Solo letras y espacios permitidos. Mínimo 3 caracteres."
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors bg-white/50 focus:bg-white"
@@ -98,6 +102,7 @@ const Register: React.FC = () => {
                   type="email"
                   autoComplete="email"
                   required
+                  maxLength={100}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors bg-white/50 focus:bg-white"
@@ -120,6 +125,9 @@ const Register: React.FC = () => {
                   type="password"
                   autoComplete="new-password"
                   required
+                  minLength={8}
+                  maxLength={20}
+                  title="La contraseña debe tener entre 8 y 20 caracteres."
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors bg-white/50 focus:bg-white"
