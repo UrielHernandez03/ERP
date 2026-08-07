@@ -76,10 +76,11 @@ const Login: React.FC = () => {
                   type="email"
                   autoComplete="email"
                   required
+                  maxLength={100}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors bg-white/50 focus:bg-white"
-                  placeholder="admin@inventorypro.com"
+                  placeholder="tucorreo@ejemplo.com"
                 />
               </div>
             </div>
@@ -98,6 +99,7 @@ const Login: React.FC = () => {
                   type="password"
                   autoComplete="current-password"
                   required
+                  maxLength={20}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors bg-white/50 focus:bg-white"
@@ -120,9 +122,9 @@ const Login: React.FC = () => {
               </div>
 
               <div className="text-sm">
-                <a href="#" className="font-medium text-blue-600 hover:text-blue-500 transition-colors">
+                <Link to="/forgot-password" className="font-medium text-blue-600 hover:text-blue-500 transition-colors">
                   ¿Olvidaste tu contraseña?
-                </a>
+                </Link>
               </div>
             </div>
 
