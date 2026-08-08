@@ -11,7 +11,8 @@ import {
   Bell,
   Search,
   TrendingUp,
-  AlertCircle
+  AlertCircle,
+  ClipboardList
 } from 'lucide-react';
 import axiosInstance from '../api/axios';
 
@@ -90,26 +91,24 @@ const Dashboard: React.FC = () => {
 
           {/* Menú de navegación */}
           <nav className="p-4 space-y-1">
-            <a href="#" className="flex items-center gap-3 px-3 py-2.5 bg-blue-50 text-blue-700 rounded-xl font-medium transition-colors">
-              <LayoutDashboard className="w-5 h-5" />
-              Dashboard
-            </a>
-            <a href="#" className="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl font-medium transition-colors">
-              <Boxes className="w-5 h-5" />
-              Productos
-            </a>
-            <a href="#" className="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl font-medium transition-colors">
-              <Tags className="w-5 h-5" />
-              Categorías
-            </a>
-            <a href="#" className="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl font-medium transition-colors">
-              <Truck className="w-5 h-5" />
-              Proveedores
-            </a>
-            <a href="#" className="flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl font-medium transition-colors">
-              <Users className="w-5 h-5" />
-              Usuarios
-            </a>
+            <button onClick={() => navigate('/dashboard')} className="w-full flex items-center gap-3 px-3 py-2.5 bg-blue-50 text-blue-700 rounded-xl font-medium transition-colors">
+              <LayoutDashboard className="w-5 h-5" /> Dashboard
+            </button>
+            <button onClick={() => navigate('/inventory')} className="w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl font-medium transition-colors">
+              <ClipboardList className="w-5 h-5" /> Inventario
+            </button>
+            <button onClick={() => navigate('/products')} className="w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl font-medium transition-colors">
+              <Boxes className="w-5 h-5" /> Productos
+            </button>
+            <button onClick={() => navigate('/categories')} className="w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl font-medium transition-colors">
+              <Tags className="w-5 h-5" /> Categorías
+            </button>
+            <button onClick={() => navigate('/providers')} className="w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl font-medium transition-colors">
+              <Truck className="w-5 h-5" /> Proveedores
+            </button>
+            <button className="w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl font-medium transition-colors">
+              <Users className="w-5 h-5" /> Usuarios
+            </button>
           </nav>
         </div>
 
@@ -172,7 +171,7 @@ const Dashboard: React.FC = () => {
           {/* Tarjetas de Resumen */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             {/* Tarjeta 1 */}
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+            <div onClick={() => navigate('/products')} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow cursor-pointer">
               <div className="flex justify-between items-start mb-4">
                 <div>
                   <p className="text-sm font-medium text-gray-500">Total Productos</p>
@@ -205,7 +204,7 @@ const Dashboard: React.FC = () => {
             </div>
 
             {/* Tarjeta 3 */}
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+            <div onClick={() => navigate('/categories')} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow cursor-pointer">
               <div className="flex justify-between items-start mb-4">
                 <div>
                   <p className="text-sm font-medium text-gray-500">Categorías</p>
@@ -221,7 +220,7 @@ const Dashboard: React.FC = () => {
             </div>
 
             {/* Tarjeta 4 */}
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+            <div onClick={() => navigate('/providers')} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow cursor-pointer">
               <div className="flex justify-between items-start mb-4">
                 <div>
                   <p className="text-sm font-medium text-gray-500">Proveedores</p>
