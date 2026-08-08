@@ -29,6 +29,7 @@ model Category {
   id        Int       @id @default(autoincrement())
   name      String    @unique
   description String?
+  isActive  Boolean   @default(true)
   products  Product[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -57,6 +58,7 @@ model Product {
   stock       Int       @default(0)
   minStock    Int       @default(5)
   imageUrl    String?
+  isActive    Boolean   @default(true)
   
   categoryId  Int
   category    Category  @relation(fields: [categoryId], references: [id])
