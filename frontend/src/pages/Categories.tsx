@@ -1,22 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  PackageOpen, 
   Search, 
   Plus, 
-  MoreVertical, 
   Trash2, 
   Edit,
-  LayoutDashboard,
-  Boxes,
-  Tags,
-  Users,
-  Truck,
-  LogOut,
-  Bell,
-  ClipboardList
+  X,
+  Tags
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../api/axios';
+import { useToast } from '../context/ToastContext';
 
 interface Category {
   id: number;
@@ -25,13 +17,14 @@ interface Category {
 }
 
 const Categories: React.FC = () => {
-  const navigate = useNavigate();
+  const { showToast } = useToast();
   const [categories, setCategories] = useState<Category[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [userName, setUserName] = useState('');
-  
-  // Modal state
+  const [loading, setLoading] = useState(false);
+
+  // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     description: ''
@@ -39,229 +32,235 @@ const Categories: React.FC = () => {
 
   useEffect(() => {
     fetchCategories();
-    fetchUser();
   }, []);
 
-  const fetchUser = async () => {
-    try {
-      const res = await axiosInstance.get('/auth/me');
-      setUserName(res.data.name);
-    } catch (error) {
-      console.error('Error cargando usuario', error);
-    }
-  };
-
   const fetchCategories = async () => {
+    setLoading(true);
     try {
       const res = await axiosInstance.get('/categories');
       setCategories(res.data);
     } catch (error) {
       console.error('Error fetching categories:', error);
+      showToast('Error al obtener la lista de categorías', 'error');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const getInitials = (name: string) => {
-    if (!name) return 'AD';
-    const parts = name.trim().split(' ');
-    if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
-    return name.substring(0, 2).toUpperCase();
+  const handleOpenCreateModal = () => {
+    setEditingCategory(null);
+    setFormData({ name: '', description: '' });
+    setIsModalOpen(true);
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/login');
+  const handleOpenEditModal = (category: Category) => {
+    setEditingCategory(category);
+    setFormData({
+      name: category.name,
+      description: category.description || ''
+    });
+    setIsModalOpen(true);
   };
 
-  const handleCreateCategory = async (e: React.FormEvent) => {
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setEditingCategory(null);
+  };
+
+  const handleSaveCategory = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await axiosInstance.post('/categories', formData);
-      setIsModalOpen(false);
-      setFormData({ name: '', description: '' });
+      if (editingCategory) {
+        // Editar
+        await axiosInstance.put(`/categories/${editingCategory.id}`, formData);
+        showToast('Categoría actualizada con éxito', 'success');
+      } else {
+        // Crear
+        await axiosInstance.post('/categories', formData);
+        showToast('Categoría creada con éxito', 'success');
+      }
+      handleCloseModal();
       fetchCategories();
     } catch (error: any) {
-      alert(error.response?.data?.message || 'Error al crear categoría');
+      showToast(error.response?.data?.message || 'Error al guardar la categoría', 'error');
     }
   };
 
-  // Filtrado
+  const handleDelete = async (id: number) => {
+    if (window.confirm('¿Estás seguro de eliminar esta categoría?')) {
+      try {
+        await axiosInstance.delete(`/categories/${id}`);
+        showToast('Categoría eliminada correctamente', 'success');
+        fetchCategories();
+      } catch (error: any) {
+        showToast(error.response?.data?.message || 'Error al eliminar la categoría', 'error');
+      }
+    }
+  };
+
   const filteredCategories = categories.filter(c => 
-    c.name.toLowerCase().includes(searchTerm.toLowerCase())
+    c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (c.description && c.description.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   return (
-    <div className="flex h-screen bg-gray-50 font-sans">
+    <div className="space-y-6 animate-slide-in">
       
-      {/* Sidebar */}
-      <aside className="w-64 bg-white border-r border-gray-200 flex flex-col justify-between hidden md:flex">
-        <div>
-          <div className="h-16 flex items-center px-6 border-b border-gray-100">
-            <div className="flex items-center gap-2 text-blue-600">
-              <PackageOpen className="w-7 h-7" />
-              <span className="text-xl font-bold text-gray-900 tracking-tight">Inventory<span className="text-blue-600">Pro</span></span>
-            </div>
-          </div>
-          <nav className="p-4 space-y-1">
-            <button onClick={() => navigate('/dashboard')} className="w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl font-medium transition-colors">
-              <LayoutDashboard className="w-5 h-5" /> Dashboard
-            </button>
-            <button onClick={() => navigate('/inventory')} className="w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl font-medium transition-colors">
-              <ClipboardList className="w-5 h-5" /> Inventario
-            </button>
-            <button onClick={() => navigate('/products')} className="w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl font-medium transition-colors">
-              <Boxes className="w-5 h-5" /> Productos
-            </button>
-            <button className="w-full flex items-center gap-3 px-3 py-2.5 bg-blue-50 text-blue-700 rounded-xl font-medium transition-colors">
-              <Tags className="w-5 h-5" /> Categorías
-            </button>
-            <button onClick={() => navigate('/providers')} className="w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl font-medium transition-colors">
-              <Truck className="w-5 h-5" /> Proveedores
-            </button>
-            <button className="w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl font-medium transition-colors">
-              <Users className="w-5 h-5" /> Usuarios
-            </button>
-          </nav>
+      {/* Barra de Acciones */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="relative w-full sm:w-80">
+          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+          <input 
+            type="text" 
+            placeholder="Buscar por nombre o descripción..." 
+            className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-100 hover:border-slate-200 focus:border-indigo-500 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500 shadow-sm transition-all"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value.replace(/[^a-zA-Z0-9\s]/g, ''))}
+          />
         </div>
-        <div className="p-4 border-t border-gray-100">
-          <button onClick={handleLogout} className="flex items-center gap-3 px-3 py-2.5 w-full text-red-600 hover:bg-red-50 rounded-xl font-medium transition-colors group">
-            <LogOut className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-            Cerrar sesión
-          </button>
-        </div>
-      </aside>
+        
+        <button 
+          onClick={handleOpenCreateModal}
+          className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition-all shadow-md shadow-indigo-500/10 active:scale-95"
+        >
+          <Plus className="w-4 h-4" /> Nueva Categoría
+        </button>
+      </div>
 
-      {/* Main Content */}
-      <main className="flex-1 flex flex-col overflow-hidden relative">
-        <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 z-10">
-          <h1 className="text-xl font-semibold text-gray-800">Categorías</h1>
-          <div className="flex items-center gap-6">
-            <button className="relative text-gray-500 hover:text-blue-600 transition-colors">
-              <Bell className="w-6 h-6" />
-              <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
-            </button>
-            <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold border border-blue-200">
-              {getInitials(userName)}
-            </div>
-          </div>
-        </header>
-
-        <div className="flex-1 overflow-auto p-8">
-          <div className="flex justify-between items-center mb-6">
-            <div className="relative">
-              <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input 
-                type="text" 
-                placeholder="Buscar categoría..." 
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value.replace(/[^a-zA-Z0-9\s]/g, ''))}
-                onKeyDown={(e) => {
-                  if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(e.key)) e.preventDefault();
-                }}
-                className="pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-80 shadow-sm transition-shadow"
-              />
-            </div>
-            <button 
-              onClick={() => setIsModalOpen(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl text-sm font-medium transition-colors flex items-center gap-2 shadow-sm"
-            >
-              <Plus className="w-4 h-4" />
-              Nueva Categoría
-            </button>
-          </div>
-
-          <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-gray-50 border-b border-gray-200">
-                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Nombre</th>
-                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Descripción</th>
-                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Acciones</th>
+      {/* Tabla de Categorías */}
+      <div className="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs border-collapse">
+            <thead className="bg-slate-50/50 text-slate-400 font-semibold tracking-wider uppercase border-b border-slate-50">
+              <tr>
+                <th className="px-6 py-4">ID</th>
+                <th className="px-6 py-4">Nombre de Categoría</th>
+                <th className="px-6 py-4">Descripción</th>
+                <th className="px-6 py-4 text-right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-50">
+              {loading ? (
+                <tr>
+                  <td colSpan={4} className="px-6 py-12 text-center">
+                    <div className="flex justify-center items-center gap-2">
+                      <div className="animate-spin rounded-full h-5 w-5 border-2 border-indigo-500 border-t-transparent"></div>
+                      <span className="text-slate-400 font-medium">Cargando categorías...</span>
+                    </div>
+                  </td>
                 </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {filteredCategories.length === 0 ? (
-                  <tr>
-                    <td colSpan={3} className="px-6 py-8 text-center text-gray-500">
-                      No se encontraron categorías.
+              ) : filteredCategories.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="px-6 py-16 text-center">
+                    <div className="flex flex-col items-center justify-center">
+                      <Tags className="w-10 h-10 text-slate-300 mb-2" />
+                      <p className="text-slate-400 font-medium">No se encontraron categorías registradas.</p>
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+                filteredCategories.map(cat => (
+                  <tr key={cat.id} className="hover:bg-slate-50/50 transition-colors group">
+                    <td className="px-6 py-4 font-mono text-slate-400 font-semibold">#{cat.id}</td>
+                    <td className="px-6 py-4 font-bold text-slate-800">{cat.name}</td>
+                    <td className="px-6 py-4 text-slate-500 max-w-sm truncate">{cat.description || 'Sin descripción'}</td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex justify-end items-center gap-1.5">
+                        <button 
+                          onClick={() => handleOpenEditModal(cat)}
+                          className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
+                          title="Editar"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                        <button 
+                          onClick={() => handleDelete(cat.id)}
+                          className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
+                          title="Eliminar"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
-                ) : (
-                  filteredCategories.map((cat) => (
-                    <tr key={cat.id} className="hover:bg-gray-50/50 transition-colors">
-                      <td className="px-6 py-4">
-                        <div className="font-medium text-gray-900">{cat.name}</div>
-                      </td>
-                      <td className="px-6 py-4 text-gray-600 text-sm">
-                        {cat.description || 'Sin descripción'}
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <button className="text-gray-400 hover:text-gray-600 p-1.5 rounded-lg hover:bg-gray-100 transition-colors">
-                          <MoreVertical className="w-5 h-5" />
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Modal Crear/Editar Categoría */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-3xl p-6 md:p-8 w-full max-w-md shadow-2xl border border-slate-100 relative overflow-hidden animate-scale-up">
+            
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-base font-bold text-slate-800">
+                {editingCategory ? 'Editar Categoría' : 'Registrar Categoría'}
+              </h3>
+              <button 
+                onClick={handleCloseModal}
+                className="text-slate-400 hover:text-slate-600 p-1 hover:bg-slate-50 rounded-lg transition-all"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveCategory} className="space-y-4">
+              
+              {/* Nombre */}
+              <div>
+                <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Nombre de Categoría</label>
+                <input 
+                  type="text" 
+                  required
+                  placeholder="Ej. Electrónicos"
+                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-100 focus:bg-white focus:border-indigo-500 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all"
+                  value={formData.name}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/[^a-zA-Z0-9\s]/g, '');
+                    setFormData({...formData, name: val});
+                  }}
+                />
+              </div>
+
+              {/* Descripción */}
+              <div>
+                <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Descripción (Opcional)</label>
+                <textarea 
+                  placeholder="Ej. Artículos electrónicos y gadgets tecnológicos..."
+                  rows={4}
+                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-100 focus:bg-white focus:border-indigo-500 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all resize-none"
+                  value={formData.description}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/[^a-zA-Z0-9\s]/g, '');
+                    setFormData({...formData, description: val});
+                  }}
+                />
+              </div>
+
+              {/* Botones */}
+              <div className="flex justify-end gap-3.5 pt-4 border-t border-slate-50 mt-6">
+                <button 
+                  type="button"
+                  onClick={handleCloseModal}
+                  className="px-4 py-2 border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 rounded-xl text-xs font-semibold transition-all"
+                >
+                  Cancelar
+                </button>
+                <button 
+                  type="submit"
+                  className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-indigo-500/10"
+                >
+                  Guardar
+                </button>
+              </div>
+            </form>
           </div>
         </div>
+      )}
 
-        {/* Modal Nueva Categoría */}
-        {isModalOpen && (
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden">
-              <div className="px-8 py-6 border-b border-gray-100">
-                <h2 className="text-xl font-bold text-gray-900">Registrar Categoría</h2>
-              </div>
-              <form onSubmit={handleCreateCategory} className="p-8 space-y-5">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Nombre *</label>
-                  <input 
-                    type="text" 
-                    required
-                    value={formData.name}
-                    onChange={(e) => setFormData({...formData, name: e.target.value.replace(/[^a-zA-Z0-9\s]/g, '')})}
-                    onKeyDown={(e) => {
-                      if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(e.key)) e.preventDefault();
-                    }}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-                    placeholder="Ej. Lácteos"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Descripción</label>
-                  <textarea 
-                    value={formData.description}
-                    onChange={(e) => setFormData({...formData, description: e.target.value.replace(/[^a-zA-Z0-9\s]/g, '')})}
-                    onKeyDown={(e) => {
-                      if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(e.key)) e.preventDefault();
-                    }}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none resize-none"
-                    placeholder="Descripción breve..."
-                    rows={3}
-                  />
-                </div>
-                <div className="pt-4 flex gap-3">
-                  <button 
-                    type="button" 
-                    onClick={() => setIsModalOpen(false)}
-                    className="flex-1 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-xl transition-colors"
-                  >
-                    Cancelar
-                  </button>
-                  <button 
-                    type="submit" 
-                    className="flex-1 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl transition-colors"
-                  >
-                    Guardar
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-      </main>
     </div>
   );
 };
