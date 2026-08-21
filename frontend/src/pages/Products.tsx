@@ -395,7 +395,11 @@ const Products: React.FC = () => {
                       placeholder="5"
                       className="w-full px-4 py-2.5 bg-slate-50 border border-slate-100 focus:bg-white focus:border-indigo-500 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all"
                       value={formData.minStock}
-                      onChange={(e) => setFormData({...formData, minStock: e.target.value})}
+                      onChange={(e) => {
+                        const val = e.target.value.replace(/[^0-9]/g, '');
+                        if (val.length > 5) return;
+                        setFormData({...formData, minStock: val});
+                      }}
                     />
                   </div>
                 ) : (
@@ -409,7 +413,11 @@ const Products: React.FC = () => {
                         placeholder="0"
                         className="w-full px-4 py-2.5 bg-slate-50 border border-slate-100 focus:bg-white focus:border-indigo-500 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all"
                         value={formData.stock}
-                        onChange={(e) => setFormData({...formData, stock: e.target.value})}
+                        onChange={(e) => {
+                          const val = e.target.value.replace(/[^0-9]/g, '');
+                          if (val.length > 5) return;
+                          setFormData({...formData, stock: val});
+                        }}
                       />
                     </div>
                   </>

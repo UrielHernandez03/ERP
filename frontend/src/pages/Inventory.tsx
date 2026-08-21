@@ -105,6 +105,8 @@ const Inventory: React.FC = () => {
     }
   };
 
+  const selectedProduct = products.find(p => p.id === parseInt(formData.productId, 10));
+
   const filteredTransactions = transactions.filter(t => 
     t.product.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
     t.product.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -357,11 +359,36 @@ const Inventory: React.FC = () => {
               <input 
                 type="number" 
                 required
+                min={formData.type === 'ADJUSTMENT' ? undefined : 1}
+                max={formData.type === 'OUT' && selectedProduct ? selectedProduct.stock : 99999}
                 placeholder="Cantidad de unidades..."
                 className="w-full px-4 py-2.5 bg-slate-50 border border-slate-100 focus:bg-white focus:border-indigo-500 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all"
                 value={formData.quantity}
-                onChange={(e) => setFormData({...formData, quantity: e.target.value})}
+                onChange={(e) => {
+                  let val = e.target.value;
+                  if (formData.type === 'ADJUSTMENT') {
+                    val = val.replace(/[^0-9-]/g, '');
+                    if (val.indexOf('-') > 0) val = val.replace('-', '');
+                  } else {
+                    val = val.replace(/[^0-9]/g, '');
+                  }
+                  
+                  if (val.length > 5) return;
+
+                  const num = parseInt(val, 10);
+                  if (formData.type === 'OUT' && selectedProduct && num > selectedProduct.stock) {
+                    showToast(`Stock insuficiente. El stock actual es de ${selectedProduct.stock} unidades.`, 'warning');
+                    return;
+                  }
+
+                  setFormData({...formData, quantity: val});
+                }}
               />
+              {selectedProduct && (
+                <p className="text-[10px] text-slate-400 font-semibold mt-1.5">
+                  Stock disponible en almacén: <span className="text-indigo-600 font-bold">${selectedProduct.stock} unidades</span>
+                </p>
+              )}
             </div>
 
             {/* Notas / Justificación */}

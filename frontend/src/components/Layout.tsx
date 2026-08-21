@@ -27,6 +27,22 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [userRole, setUserRole] = useState<string>('');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
+  const [lowStockAlerts, setLowStockAlerts] = useState<any[]>([]);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+
+  const fetchAlerts = async () => {
+    try {
+      const res = await axiosInstance.get('/products');
+      const alertProducts = res.data.filter((p: any) => p.stock <= p.minStock);
+      setLowStockAlerts(alertProducts);
+    } catch (error) {
+      console.error("Error cargando alertas:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchAlerts();
+  }, [location.pathname]);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -235,10 +251,70 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             </div>
             
             {/* Notificaciones */}
-            <button className="relative p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50/50 rounded-xl transition-all">
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-indigo-600 rounded-full ring-2 ring-white"></span>
-            </button>
+            <div className="relative">
+              <button 
+                onClick={() => {
+                  setIsNotificationsOpen(!isNotificationsOpen);
+                  setIsUserDropdownOpen(false);
+                }}
+                className={`relative p-2 rounded-xl transition-all cursor-pointer ${
+                  isNotificationsOpen 
+                    ? 'text-indigo-600 bg-indigo-50' 
+                    : 'text-slate-400 hover:text-indigo-600 hover:bg-indigo-50/50'
+                }`}
+              >
+                <Bell className="w-5 h-5" />
+                {lowStockAlerts.length > 0 && (
+                  <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-rose-500 text-white text-[9px] font-extrabold rounded-full flex items-center justify-center ring-2 ring-white">
+                    {lowStockAlerts.length}
+                  </span>
+                )}
+              </button>
+
+              {isNotificationsOpen && (
+                <>
+                  <div className="fixed inset-0 z-20" onClick={() => setIsNotificationsOpen(false)}></div>
+                  <div className="absolute right-0 mt-2.5 w-80 bg-white border border-slate-100 rounded-2xl shadow-xl p-4 z-30 animate-fade-in text-slate-800">
+                    <div className="flex justify-between items-center mb-3 pb-2 border-b border-slate-50">
+                      <h4 className="text-xs font-bold text-slate-800">Notificaciones de Stock</h4>
+                      <span className="px-2 py-0.5 bg-rose-50 text-rose-600 text-[9px] font-bold rounded-lg">
+                        {lowStockAlerts.length} Críticos
+                      </span>
+                    </div>
+
+                    <div className="max-h-60 overflow-y-auto space-y-2 pr-1">
+                      {lowStockAlerts.length === 0 ? (
+                        <div className="py-6 text-center">
+                          <p className="text-xs text-slate-400 font-medium">No hay alertas de inventario.</p>
+                          <p className="text-[10px] text-slate-400 mt-0.5">Todo tu stock está bajo control.</p>
+                        </div>
+                      ) : (
+                        lowStockAlerts.map(prod => (
+                          <div 
+                            key={prod.id}
+                            onClick={() => {
+                              navigate('/inventory');
+                              setIsNotificationsOpen(false);
+                            }}
+                            className="p-2.5 bg-rose-50/30 hover:bg-rose-50 border border-rose-100/50 rounded-xl cursor-pointer transition-all flex items-start gap-2.5 group text-left"
+                          >
+                            <span className="w-1.5 h-1.5 bg-rose-500 rounded-full mt-1.5 animate-ping flex-shrink-0"></span>
+                            <div className="min-w-0">
+                              <p className="text-xs font-bold text-slate-800 group-hover:text-rose-700 transition-colors truncate">
+                                {prod.name}
+                              </p>
+                              <p className="text-[10px] text-slate-400 font-medium mt-0.5">
+                                Stock crítico: <span className="font-bold text-rose-600">{prod.stock}</span> de {prod.minStock} mín.
+                              </p>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
             
             {/* Avatar Dropdown */}
             <div className="relative">
