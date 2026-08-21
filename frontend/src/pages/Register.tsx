@@ -35,41 +35,42 @@ const Register: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden">
-      <div className="absolute top-0 -left-4 w-72 h-72 bg-blue-300 rounded-full mix-blend-multiply filter blur-2xl opacity-30 animate-blob"></div>
-      <div className="absolute top-0 -right-4 w-72 h-72 bg-blue-400 rounded-full mix-blend-multiply filter blur-2xl opacity-30 animate-blob animation-delay-2000"></div>
-      <div className="absolute -bottom-8 left-20 w-72 h-72 bg-indigo-300 rounded-full mix-blend-multiply filter blur-2xl opacity-30 animate-blob animation-delay-4000"></div>
+    <div className="min-h-screen bg-slate-950 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden">
+      {/* Dynamic Glowing Mesh Background */}
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-500 rounded-full mix-blend-screen filter blur-3xl opacity-20 animate-pulse"></div>
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-violet-600 rounded-full mix-blend-screen filter blur-3xl opacity-20 animate-pulse animation-delay-2000"></div>
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-500/5 rounded-full filter blur-3xl"></div>
 
       <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10">
         <div className="flex justify-center">
-          <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30 transform transition-transform hover:scale-105">
-            <PackageOpen className="text-white w-8 h-8" />
+          <div className="w-16 h-16 bg-gradient-to-tr from-indigo-500 to-violet-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/30 transform transition-transform hover:scale-105 hover:rotate-3">
+            <PackageOpen className="text-white w-8 h-8 animate-bounce" />
           </div>
         </div>
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 tracking-tight">
+        <h2 className="mt-6 text-center text-3xl font-extrabold text-white tracking-tight">
           Crea tu cuenta
         </h2>
-        <p className="mt-2 text-center text-sm text-gray-600">
+        <p className="mt-2 text-center text-sm text-slate-400 font-medium">
           Únete a InventoryPro ERP y administra tu negocio
         </p>
       </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md relative z-10">
-        <div className="bg-white/80 backdrop-blur-xl py-8 px-4 shadow-2xl sm:rounded-3xl sm:px-10 border border-white/20">
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md relative z-10 px-4 sm:px-0">
+        <div className="bg-slate-900/50 backdrop-blur-2xl py-8 px-6 shadow-2xl sm:rounded-3xl sm:px-10 border border-slate-800/80">
           <form className="space-y-6" onSubmit={handleRegister}>
             {error && (
-              <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg flex items-center animate-pulse">
-                <p className="text-sm text-red-700">{error}</p>
+              <div className="bg-red-500/10 border-l-4 border-red-500 p-4 rounded-r-lg flex items-center animate-pulse">
+                <p className="text-xs font-semibold text-red-400">{error}</p>
               </div>
             )}
 
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="name" className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                 Nombre completo
               </label>
               <div className="mt-2 relative rounded-xl shadow-sm">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <User className="h-5 w-5 text-gray-400" />
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                  <User className="h-4.5 w-4.5 text-slate-500" />
                 </div>
                 <input
                   id="name"
@@ -81,20 +82,20 @@ const Register: React.FC = () => {
                   pattern="^[A-Za-zÁ-Úá-úñÑ\s]+$"
                   title="Solo letras y espacios permitidos. Mínimo 3 caracteres."
                   value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors bg-white/50 focus:bg-white"
+                  onChange={(e) => setName(e.target.value.replace(/[^a-zA-ZÁ-Úá-úñÑ\s]/g, ''))}
+                  className="block w-full pl-10 pr-3 py-3 border border-slate-800 focus:border-indigo-500 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all bg-slate-950/40 text-white placeholder-slate-600 focus:bg-slate-950/80"
                   placeholder="Juan Pérez"
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="email" className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                 Correo electrónico
               </label>
               <div className="mt-2 relative rounded-xl shadow-sm">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-gray-400" />
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                  <Mail className="h-4.5 w-4.5 text-slate-500" />
                 </div>
                 <input
                   id="email"
@@ -104,20 +105,20 @@ const Register: React.FC = () => {
                   required
                   maxLength={100}
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors bg-white/50 focus:bg-white"
+                  onChange={(e) => setEmail(e.target.value.replace(/[^a-zA-Z0-9@._-]/g, ''))}
+                  className="block w-full pl-10 pr-3 py-3 border border-slate-800 focus:border-indigo-500 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all bg-slate-950/40 text-white placeholder-slate-600 focus:bg-slate-950/80"
                   placeholder="juan@ejemplo.com"
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="password" className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                 Contraseña
               </label>
               <div className="mt-2 relative rounded-xl shadow-sm">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-gray-400" />
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                  <Lock className="h-4.5 w-4.5 text-slate-500" />
                 </div>
                 <input
                   id="password"
@@ -129,8 +130,8 @@ const Register: React.FC = () => {
                   maxLength={20}
                   title="La contraseña debe tener entre 8 y 20 caracteres."
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors bg-white/50 focus:bg-white"
+                  onChange={(e) => setPassword(e.target.value.replace(/[^a-zA-Z0-9\s]/g, ''))}
+                  className="block w-full pl-10 pr-3 py-3 border border-slate-800 focus:border-indigo-500 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all bg-slate-950/40 text-white placeholder-slate-600 focus:bg-slate-950/80"
                   placeholder="••••••••"
                 />
               </div>
@@ -140,7 +141,7 @@ const Register: React.FC = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-xl shadow-lg shadow-blue-500/30 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all hover:scale-[1.02] disabled:opacity-70 disabled:hover:scale-100"
+                className="w-full flex justify-center items-center py-3.5 px-4 border border-transparent rounded-xl text-xs font-bold text-white bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30 hover:scale-[1.02] active:scale-98 transition-all disabled:opacity-70 disabled:hover:scale-100 cursor-pointer"
               >
                 {loading ? 'Creando cuenta...' : 'Crear mi cuenta'}
                 {!loading && <ArrowRight className="ml-2 h-4 w-4" />}
@@ -148,10 +149,10 @@ const Register: React.FC = () => {
             </div>
           </form>
 
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
+          <div className="mt-6 text-center text-xs font-semibold">
+            <p className="text-slate-400">
               ¿Ya tienes una cuenta?{' '}
-              <Link to="/login" className="font-medium text-blue-600 hover:text-blue-500 transition-colors">
+              <Link to="/login" className="text-indigo-400 hover:text-indigo-300 transition-colors">
                 Inicia sesión aquí
               </Link>
             </p>

@@ -95,14 +95,14 @@ const Dashboard: React.FC = () => {
         {/* Tarjeta 1 - Productos */}
         <div 
           onClick={() => navigate('/products')} 
-          className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-slate-200/80 transition-all duration-300 cursor-pointer group"
+          className="card-premium p-6 rounded-2xl cursor-pointer group"
         >
           <div className="flex justify-between items-start mb-4">
             <div>
               <p className="text-xs font-semibold tracking-wider text-slate-400 uppercase">Total Productos</p>
               <h3 className="text-3xl font-extrabold text-slate-800 mt-1.5">{stats.totalProducts}</h3>
             </div>
-            <div className="p-3 bg-indigo-50 text-indigo-600 rounded-xl group-hover:scale-110 transition-transform">
+            <div className="p-3 bg-gradient-to-tr from-indigo-500 to-indigo-600 text-white rounded-xl group-hover:scale-110 shadow-md shadow-indigo-500/20 transition-transform">
               <Boxes className="w-5 h-5" />
             </div>
           </div>
@@ -115,14 +115,14 @@ const Dashboard: React.FC = () => {
         {/* Tarjeta 2 - Stock Bajo */}
         <div 
           onClick={() => navigate('/inventory')}
-          className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-slate-200/80 transition-all duration-300 cursor-pointer group"
+          className="card-premium p-6 rounded-2xl cursor-pointer group"
         >
           <div className="flex justify-between items-start mb-4">
             <div>
               <p className="text-xs font-semibold tracking-wider text-slate-400 uppercase">Stock Crítico</p>
               <h3 className="text-3xl font-extrabold text-slate-800 mt-1.5">{stats.lowStockProducts}</h3>
             </div>
-            <div className="p-3 bg-rose-50 text-rose-600 rounded-xl group-hover:scale-110 transition-transform">
+            <div className="p-3 bg-gradient-to-tr from-rose-500 to-red-600 text-white rounded-xl group-hover:scale-110 shadow-md shadow-rose-500/20 transition-transform">
               <AlertCircle className="w-5 h-5" />
             </div>
           </div>
@@ -136,14 +136,14 @@ const Dashboard: React.FC = () => {
         {/* Tarjeta 3 - Categorías */}
         <div 
           onClick={() => navigate('/categories')} 
-          className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-slate-200/80 transition-all duration-300 cursor-pointer group"
+          className="card-premium p-6 rounded-2xl cursor-pointer group"
         >
           <div className="flex justify-between items-start mb-4">
             <div>
               <p className="text-xs font-semibold tracking-wider text-slate-400 uppercase">Categorías</p>
               <h3 className="text-3xl font-extrabold text-slate-800 mt-1.5">{stats.totalCategories}</h3>
             </div>
-            <div className="p-3 bg-amber-50 text-amber-600 rounded-xl group-hover:scale-110 transition-transform">
+            <div className="p-3 bg-gradient-to-tr from-amber-500 to-orange-500 text-white rounded-xl group-hover:scale-110 shadow-md shadow-amber-500/20 transition-transform">
               <Tags className="w-5 h-5" />
             </div>
           </div>
@@ -155,14 +155,14 @@ const Dashboard: React.FC = () => {
         {/* Tarjeta 4 - Proveedores */}
         <div 
           onClick={() => navigate('/providers')} 
-          className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-slate-200/80 transition-all duration-300 cursor-pointer group"
+          className="card-premium p-6 rounded-2xl cursor-pointer group"
         >
           <div className="flex justify-between items-start mb-4">
             <div>
               <p className="text-xs font-semibold tracking-wider text-slate-400 uppercase">Proveedores</p>
               <h3 className="text-3xl font-extrabold text-slate-800 mt-1.5">{stats.totalProviders}</h3>
             </div>
-            <div className="p-3 bg-emerald-50 text-emerald-600 rounded-xl group-hover:scale-110 transition-transform">
+            <div className="p-3 bg-gradient-to-tr from-emerald-500 to-teal-600 text-white rounded-xl group-hover:scale-110 shadow-md shadow-emerald-500/20 transition-transform">
               <Truck className="w-5 h-5" />
             </div>
           </div>
@@ -177,7 +177,7 @@ const Dashboard: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Actividad Reciente (Kárdex Express) */}
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 lg:col-span-2">
+        <div className="card-premium rounded-2xl p-6 lg:col-span-2">
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-base font-bold text-slate-800">Últimos Movimientos</h3>
             <button 
@@ -245,7 +245,7 @@ const Dashboard: React.FC = () => {
         </div>
 
         {/* Accesos Rápidos */}
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 flex flex-col justify-between">
+        <div className="card-premium rounded-2xl p-6 flex flex-col justify-between">
           <div>
             <h3 className="text-base font-bold text-slate-800 mb-6">Operaciones Rápidas</h3>
             <div className="space-y-3">

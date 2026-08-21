@@ -1,9 +1,9 @@
-import { Role, TransactionType } from '@prisma/client';
+import { Role } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import { prisma } from './prisma';
 
 async function main() {
-  console.log('Iniciando carga masiva de datos (Usuarios, Categorías y 30 Productos)...');
+  console.log('Iniciando carga masiva de datos (Usuarios, Categorías, 30 Productos y 10 Proveedores)...');
 
   // 1. Crear Usuario Administrador
   const adminEmail = 'admin@inventorypro.com';
@@ -53,7 +53,38 @@ async function main() {
     categoriesMap[cat.name] = dbCat.id;
   }
 
-  // 3. Crear 30 Productos de Prueba (6 por categoría)
+  // 3. Crear 10 Proveedores
+  const providersData = [
+    { name: 'Intelco Mayorista S.A.', contact: 'Ing. Carlos Ruiz', email: 'ventas@intelcomayorista.com', phone: '+525512345678', address: 'Av. de la Reforma 115, CDMX' },
+    { name: 'Suministros TecnoGlobal', contact: 'Lic. Sofía Ramos', email: 'contacto@tecnoglobal.mx', phone: '+525598765432', address: 'Parque Industrial Vallejo, Edificio B, CDMX' },
+    { name: 'Textiles del Centro', contact: 'Roberto Gómez', email: 'rgomez@textilescentro.com', phone: '+524773456789', address: 'Boulevard Aeropuerto 450, León, Gto' },
+    { name: 'Moda y Estilo Mayorista', contact: 'Patricia Fernández', email: 'p.fernandez@modaestilomayorista.com', phone: '+523344556677', address: 'Calle Álvaro Obregón 89, Guadalajara, Jal' },
+    { name: 'Distribuidora Nacional de Víveres', contact: 'Manuel Castro', email: 'abastos@viveresnacionales.com', phone: '+525533221100', address: 'Central de Abastos, Bodega J-42, CDMX' },
+    { name: 'Alimentos y Semillas del Sur', contact: 'Laura Martínez', email: 'ventas@alimentossur.mx', phone: '+529517890123', address: 'Calzada de la República 102, Oaxaca, Oax' },
+    { name: 'Herramientas y Tornillos Truper S.A.', contact: 'Ing. Alejandro Silva', email: 'asilva@herramientastruper.com', phone: '+525555443322', address: 'Zona Industrial Jilotepec, Edo. de México' },
+    { name: 'Ferretería y Metales del Norte', contact: 'Ricardo Hinojosa', email: 'ricardo@ferremetalesnorte.com', phone: '+528183456789', address: 'Av. Universidad 1200, Monterrey, NL' },
+    { name: 'Químicos y Limpieza Sanitaria', contact: 'Dra. Elena Torres', email: 'etorres@quimicoslimpieza.com', phone: '+525587654321', address: 'Av. Insurgentes Sur 2400, CDMX' },
+    { name: 'Insumos Ecológicos Clean', contact: 'Fernando Ortiz', email: 'fortiz@cleaninsumos.com', phone: '+523399887766', address: 'Zona Industrial Zapopan, Jal' }
+  ];
+
+  console.log(`Cargando ${providersData.length} proveedores en la base de datos...`);
+
+  for (const prov of providersData) {
+    const existingProv = await prisma.provider.findFirst({
+      where: { name: prov.name }
+    });
+
+    if (!existingProv) {
+      await prisma.provider.create({
+        data: prov
+      });
+      console.log(`Proveedor '${prov.name}' creado.`);
+    } else {
+      console.log(`Proveedor '${prov.name}' ya existía.`);
+    }
+  }
+
+  // 4. Crear 30 Productos de Prueba (6 por categoría)
   const electronicaId = categoriesMap['Electrónica'];
   const ropaId = categoriesMap['Ropa'];
   const abarrotesId = categoriesMap['Abarrotes'];
@@ -120,7 +151,7 @@ async function main() {
     });
   }
 
-  console.log('¡Carga de base de datos finalizada con éxito con los 30 productos!');
+  console.log('¡Carga de base de datos finalizada con éxito!');
 }
 
 main()

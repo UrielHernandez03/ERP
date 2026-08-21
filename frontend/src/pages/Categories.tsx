@@ -122,14 +122,13 @@ const Categories: React.FC = () => {
         
         <button 
           onClick={handleOpenCreateModal}
-          className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition-all shadow-md shadow-indigo-500/10 active:scale-95"
+          className="flex items-center gap-2 btn-gradient px-4 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-95 cursor-pointer"
         >
           <Plus className="w-4 h-4" /> Nueva Categoría
         </button>
       </div>
 
-      {/* Tabla de Categorías */}
-      <div className="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden">
+      <div className="card-premium rounded-2xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
             <thead className="bg-slate-50/50 text-slate-400 font-semibold tracking-wider uppercase border-b border-slate-50">

@@ -81,16 +81,16 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     <div className="flex h-screen bg-slate-50/50 font-sans overflow-hidden">
       
       {/* Sidebar - Desktop */}
-      <aside className="w-64 bg-white border-r border-slate-100 flex flex-col justify-between hidden md:flex">
+      <aside className="w-64 bg-slate-950 border-r border-slate-900 flex flex-col justify-between hidden md:flex">
         <div>
           {/* Logo / Header */}
-          <div className="h-16 flex items-center px-6 border-b border-slate-50">
-            <div className="flex items-center gap-2.5 text-indigo-600">
-              <div className="p-1.5 bg-indigo-50 rounded-lg">
-                <PackageOpen className="w-6 h-6" />
+          <div className="h-16 flex items-center px-6 border-b border-slate-900">
+            <div className="flex items-center gap-2.5 text-white">
+              <div className="p-1.5 bg-indigo-600 rounded-lg shadow-md shadow-indigo-600/20">
+                <PackageOpen className="w-6 h-6 text-white" />
               </div>
-              <span className="text-lg font-bold text-slate-900 tracking-tight">
-                Inventory<span className="text-indigo-600">Pro</span>
+              <span className="text-lg font-bold tracking-tight">
+                Inventory<span className="text-indigo-400">Pro</span>
               </span>
             </div>
           </div>
@@ -106,11 +106,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   onClick={() => navigate(item.path)}
                   className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
                     isActive 
-                      ? 'bg-indigo-50/70 text-indigo-700 shadow-sm border border-indigo-100/30' 
-                      : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
+                      ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' 
+                      : 'text-slate-400 hover:bg-slate-900 hover:text-white'
                   }`}
                 >
-                  <Icon className={`w-5 h-5 ${isActive ? 'text-indigo-600' : 'text-slate-400'}`} />
+                  <Icon className={`w-5 h-5 ${isActive ? 'text-white' : 'text-slate-400'}`} />
                   {item.name}
                 </button>
               );
@@ -119,21 +119,21 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </div>
 
         {/* Footer Sidebar (Usuario y Logout) */}
-        <div className="p-4 border-t border-slate-50 space-y-3">
+        <div className="p-4 border-t border-slate-900 space-y-3">
           <div className="flex items-center gap-3 px-2 py-1.5">
-            <div className="w-9 h-9 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-xs">
+            <div className="w-9 h-9 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-300 font-bold text-xs">
               {getInitials(userName)}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-semibold text-slate-900 truncate">{userName || 'Usuario'}</p>
-              <p className="text-[10px] text-slate-400 font-medium tracking-wider uppercase truncate">{userRole || 'Rol'}</p>
+              <p className="text-xs font-semibold text-slate-200 truncate">{userName || 'Usuario'}</p>
+              <p className="text-[10px] text-slate-500 font-medium tracking-wider uppercase truncate">{userRole || 'Rol'}</p>
             </div>
           </div>
           <button 
             onClick={handleLogout}
-            className="flex items-center gap-3 px-3 py-2.5 w-full text-red-500 hover:bg-red-50/50 rounded-xl text-sm font-medium transition-all group"
+            className="flex items-center gap-3 px-3 py-2.5 w-full text-slate-400 hover:text-red-400 hover:bg-red-950/20 rounded-xl text-sm font-medium transition-all group"
           >
-            <LogOut className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform text-red-400" />
+            <LogOut className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform text-slate-400 group-hover:text-red-400" />
             Cerrar sesión
           </button>
         </div>
@@ -144,14 +144,18 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <div className="fixed inset-0 z-40 md:hidden flex">
           <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setIsMobileMenuOpen(false)}></div>
           
-          <aside className="relative w-64 bg-white h-full flex flex-col justify-between p-4 shadow-2xl animate-slide-in">
+          <aside className="relative w-64 bg-slate-950 border-r border-slate-900 h-full flex flex-col justify-between p-4 shadow-2xl animate-slide-in">
             <div>
-              <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-50">
-                <div className="flex items-center gap-2.5 text-indigo-600">
-                  <PackageOpen className="w-6 h-6" />
-                  <span className="text-lg font-bold text-slate-900 tracking-tight">InventoryPro</span>
+              <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-900">
+                <div className="flex items-center gap-2.5 text-white">
+                  <div className="p-1.5 bg-indigo-600 rounded-lg shadow-md shadow-indigo-600/20">
+                    <PackageOpen className="w-6 h-6 text-white" />
+                  </div>
+                  <span className="text-lg font-bold tracking-tight">
+                    Inventory<span className="text-indigo-400">Pro</span>
+                  </span>
                 </div>
-                <button onClick={() => setIsMobileMenuOpen(false)} className="text-slate-400 hover:text-slate-600 p-1">
+                <button onClick={() => setIsMobileMenuOpen(false)} className="text-slate-400 hover:text-slate-200 p-1">
                   <X className="w-5 h-5" />
                 </button>
               </div>
@@ -169,11 +173,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                       }}
                       className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
                         isActive 
-                          ? 'bg-indigo-50 text-indigo-700 shadow-sm border border-indigo-100/50' 
-                          : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
+                          ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' 
+                          : 'text-slate-400 hover:bg-slate-900 hover:text-white'
                       }`}
                     >
-                      <Icon className={`w-5 h-5 ${isActive ? 'text-indigo-600' : 'text-slate-400'}`} />
+                      <Icon className={`w-5 h-5 ${isActive ? 'text-white' : 'text-slate-400'}`} />
                       {item.name}
                     </button>
                   );
@@ -181,19 +185,19 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               </nav>
             </div>
 
-            <div className="border-t border-slate-50 pt-4 space-y-3">
+            <div className="border-t border-slate-900 pt-4 space-y-3">
               <div className="flex items-center gap-3 px-2 py-1">
-                <div className="w-9 h-9 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-700 font-bold text-xs border border-indigo-100">
+                <div className="w-9 h-9 rounded-xl bg-slate-900 flex items-center justify-center text-slate-300 font-bold text-xs border border-slate-800">
                   {getInitials(userName)}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold text-slate-900 truncate">{userName}</p>
-                  <p className="text-[10px] text-slate-400 font-medium tracking-wider uppercase truncate">{userRole}</p>
+                  <p className="text-xs font-semibold text-slate-200 truncate">{userName}</p>
+                  <p className="text-[10px] text-slate-500 font-medium tracking-wider uppercase truncate">{userRole}</p>
                 </div>
               </div>
               <button 
                 onClick={handleLogout}
-                className="flex items-center gap-3 px-3 py-2.5 w-full text-red-500 hover:bg-red-50/50 rounded-xl text-sm font-medium transition-all"
+                className="flex items-center gap-3 px-3 py-2.5 w-full text-slate-400 hover:text-red-400 hover:bg-red-950/20 rounded-xl text-sm font-medium transition-all"
               >
                 <LogOut className="w-5 h-5 text-red-400" />
                 Cerrar sesión
@@ -226,6 +230,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 type="text" 
                 placeholder="Búsqueda rápida..." 
                 className="pl-9 pr-4 py-2 bg-slate-50 hover:bg-slate-100/50 focus:bg-white border border-slate-100 focus:border-indigo-500 rounded-full text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500 w-56 transition-all duration-200"
+                onChange={(e) => { e.target.value = e.target.value.replace(/[^a-zA-Z0-9\s]/g, "") }}
               />
             </div>
             
