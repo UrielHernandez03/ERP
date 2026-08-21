@@ -14,6 +14,7 @@ import { useToast } from '../context/ToastContext';
 interface Product {
   id: number;
   sku: string;
+  barcode: string | null;
   name: string;
   description: string | null;
   price: number;
@@ -41,6 +42,7 @@ const Products: React.FC = () => {
   const [formData, setFormData] = useState({
     name: '',
     sku: '',
+    barcode: '',
     categoryId: '',
     price: '',
     stock: '',
@@ -80,6 +82,7 @@ const Products: React.FC = () => {
     setFormData({
       name: '',
       sku: '',
+      barcode: '',
       categoryId: '',
       price: '',
       stock: '0',
@@ -94,6 +97,7 @@ const Products: React.FC = () => {
     setFormData({
       name: product.name,
       sku: product.sku,
+      barcode: product.barcode || '',
       categoryId: product.categoryId.toString(),
       price: product.price.toString(),
       stock: product.stock.toString(),
@@ -168,7 +172,8 @@ const Products: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 animate-slide-in">
+    <>
+      <div className="space-y-6 animate-slide-in">
       
       {/* Barra de Acciones */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -230,8 +235,22 @@ const Products: React.FC = () => {
               ) : (
                 filteredProducts.map(product => (
                   <tr key={product.id} className="hover:bg-slate-50/50 transition-colors group">
-                    <td className="px-6 py-4 font-mono text-slate-400 font-semibold">{product.sku}</td>
-                    <td className="px-6 py-4 font-bold text-slate-800">{product.name}</td>
+                    <td className="px-6 py-4 font-mono text-slate-500 font-semibold">
+                      <p className="font-bold text-slate-800">{product.sku}</p>
+                      {product.barcode && (
+                        <p className="text-[10px] text-slate-400 font-mono mt-0.5" title="Código de Barras">
+                          {product.barcode}
+                        </p>
+                      )}
+                    </td>
+                    <td className="px-6 py-4">
+                      <p className="font-bold text-slate-800">{product.name}</p>
+                      {product.description && (
+                        <p className="text-[10px] text-slate-400 font-medium mt-0.5 max-w-xs truncate" title={product.description}>
+                          {product.description}
+                        </p>
+                      )}
+                    </td>
                     <td className="px-6 py-4">
                       <span className="px-2 py-0.5 bg-slate-50 border border-slate-100 text-slate-500 rounded-lg font-medium text-[10px]">
                         {product.category?.name || 'Sin categoría'}
@@ -263,6 +282,7 @@ const Products: React.FC = () => {
             </tbody>
           </table>
         </div>
+      </div>
       </div>
 
       {/* Modal Crear/Editar Producto */}
@@ -315,6 +335,21 @@ const Products: React.FC = () => {
                     onChange={(e) => {
                       const val = e.target.value.replace(/[^a-zA-Z0-9-]/g, '').toUpperCase();
                       setFormData({...formData, sku: val});
+                    }}
+                  />
+                </div>
+
+                {/* Código de Barras */}
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Código de Barras (Opcional)</label>
+                  <input 
+                    type="text" 
+                    placeholder="Ej. 750123456789"
+                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-100 focus:bg-white focus:border-indigo-500 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all"
+                    value={formData.barcode}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/[^a-zA-Z0-9]/g, '');
+                      setFormData({...formData, barcode: val});
                     }}
                   />
                 </div>
@@ -419,7 +454,7 @@ const Products: React.FC = () => {
         </div>
       )}
 
-    </div>
+    </>
   );
 };
 

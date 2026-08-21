@@ -12,6 +12,7 @@ const categoryRoutes_1 = __importDefault(require("./routes/categoryRoutes"));
 const productRoutes_1 = __importDefault(require("./routes/productRoutes"));
 const providerRoutes_1 = __importDefault(require("./routes/providerRoutes"));
 const inventoryRoutes_1 = __importDefault(require("./routes/inventoryRoutes"));
+const userRoutes_1 = __importDefault(require("./routes/userRoutes"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const PORT = process.env.PORT || 4000;
@@ -25,6 +26,7 @@ app.use('/api/categories', categoryRoutes_1.default);
 app.use('/api/products', productRoutes_1.default);
 app.use('/api/providers', providerRoutes_1.default);
 app.use('/api/inventory', inventoryRoutes_1.default);
+app.use('/api/users', userRoutes_1.default);
 // Ruta base
 app.get('/', (req, res) => {
     res.json({ message: 'Bienvenido a la API de InventoryPro ERP' });

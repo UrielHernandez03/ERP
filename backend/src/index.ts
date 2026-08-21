@@ -7,6 +7,7 @@ import categoryRoutes from './routes/categoryRoutes';
 import productRoutes from './routes/productRoutes';
 import providerRoutes from './routes/providerRoutes';
 import inventoryRoutes from './routes/inventoryRoutes';
+import userRoutes from './routes/userRoutes';
 
 dotenv.config();
 
@@ -24,6 +25,7 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/providers', providerRoutes);
 app.use('/api/inventory', inventoryRoutes);
+app.use('/api/users', userRoutes);
 
 // Ruta base
 app.get('/', (req: Request, res: Response) => {
