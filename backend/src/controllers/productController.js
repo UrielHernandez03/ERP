@@ -23,7 +23,7 @@ const getProducts = async (req, res) => {
 exports.getProducts = getProducts;
 const createProduct = async (req, res) => {
     try {
-        const { name, sku, categoryId, price, stock, minStock, description } = req.body;
+        const { name, sku, categoryId, price, stock, minStock, description, barcode } = req.body;
         if (!name || !sku || !categoryId) {
             res.status(400).json({ message: 'Nombre, SKU y Categoría son requeridos.' });
             return;
@@ -41,10 +41,20 @@ const createProduct = async (req, res) => {
             res.status(400).json({ message: 'Ya existe un producto activo con este SKU.' });
             return;
         }
+        if (barcode && barcode.trim() !== '') {
+            const existingBarcode = await prisma_1.prisma.product.findFirst({
+                where: { barcode: barcode.trim(), isActive: true }
+            });
+            if (existingBarcode) {
+                res.status(400).json({ message: 'Ya existe un producto activo con este código de barras.' });
+                return;
+            }
+        }
         const product = await prisma_1.prisma.product.create({
             data: {
                 name: name.trim(),
                 sku: sku.trim().toUpperCase(),
+                barcode: barcode && barcode.trim() !== '' ? barcode.trim() : null,
                 categoryId: parseInt(categoryId),
                 price: price ? parseFloat(price) : 0.0,
                 stock: stock ? parseInt(stock) : 0,
@@ -66,7 +76,7 @@ exports.createProduct = createProduct;
 const updateProduct = async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, sku, categoryId, price, stock, minStock, description } = req.body;
+        const { name, sku, categoryId, price, stock, minStock, description, barcode } = req.body;
         if (!name || !sku || !categoryId) {
             res.status(400).json({ message: 'Nombre, SKU y Categoría son requeridos.' });
             return;
@@ -87,11 +97,25 @@ const updateProduct = async (req, res) => {
             res.status(400).json({ message: 'Ya existe otro producto activo con este SKU.' });
             return;
         }
+        if (barcode && barcode.trim() !== '') {
+            const existingBarcode = await prisma_1.prisma.product.findFirst({
+                where: {
+                    barcode: barcode.trim(),
+                    isActive: true,
+                    NOT: { id: parseInt(id) }
+                }
+            });
+            if (existingBarcode) {
+                res.status(400).json({ message: 'Ya existe otro producto activo con este código de barras.' });
+                return;
+            }
+        }
         const product = await prisma_1.prisma.product.update({
             where: { id: parseInt(id) },
             data: {
                 name: name.trim(),
                 sku: sku.trim().toUpperCase(),
+                barcode: barcode && barcode.trim() !== '' ? barcode.trim() : null,
                 categoryId: parseInt(categoryId),
                 price: price ? parseFloat(price) : 0.0,
                 stock: stock ? parseInt(stock) : 0,

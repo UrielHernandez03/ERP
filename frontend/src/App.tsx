@@ -9,6 +9,7 @@ import Products from './pages/Products';
 import Categories from './pages/Categories';
 import Providers from './pages/Providers';
 import Inventory from './pages/Inventory';
+import Users from './pages/Users';
 import Layout from './components/Layout';
 
 // Basic Protected Route wrapper
@@ -37,6 +38,7 @@ function App() {
         <Route path="/categories" element={<ProtectedRoute><Layout><Categories /></Layout></ProtectedRoute>} />
         <Route path="/providers" element={<ProtectedRoute><Layout><Providers /></Layout></ProtectedRoute>} />
         <Route path="/inventory" element={<ProtectedRoute><Layout><Inventory /></Layout></ProtectedRoute>} />
+        <Route path="/users" element={<ProtectedRoute><Layout><Users /></Layout></ProtectedRoute>} />
       </Routes>
     </Router>
   );

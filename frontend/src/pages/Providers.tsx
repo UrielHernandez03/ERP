@@ -120,7 +120,8 @@ const Providers: React.FC = () => {
   );
 
   return (
-    <div className="space-y-6 animate-slide-in">
+    <>
+      <div className="space-y-6 animate-slide-in">
       
       {/* Barra de Acciones */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -208,6 +209,7 @@ const Providers: React.FC = () => {
             </tbody>
           </table>
         </div>
+      </div>
       </div>
 
       {/* Modal Crear/Editar Proveedor */}
@@ -320,7 +322,7 @@ const Providers: React.FC = () => {
         </div>
       )}
 
-    </div>
+    </>
   );
 };
 

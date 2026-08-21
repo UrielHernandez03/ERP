@@ -104,7 +104,8 @@ const Categories: React.FC = () => {
   );
 
   return (
-    <div className="space-y-6 animate-slide-in">
+    <>
+      <div className="space-y-6 animate-slide-in">
       
       {/* Barra de Acciones */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -189,6 +190,7 @@ const Categories: React.FC = () => {
           </table>
         </div>
       </div>
+      </div>
 
       {/* Modal Crear/Editar Categoría */}
       {isModalOpen && (
@@ -261,7 +263,7 @@ const Categories: React.FC = () => {
         </div>
       )}
 
-    </div>
+    </>
   );
 };
 
