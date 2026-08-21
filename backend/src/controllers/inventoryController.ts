@@ -44,7 +44,7 @@ export const createTransaction = async (req: AuthRequest, res: Response): Promis
     }
 
     // Ejecutar ambas operaciones (crear registro y actualizar stock) como una transacción atómica
-    const result = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx: any) => {
       // 1. Obtener producto actual
       const product = await tx.product.findUnique({ where: { id: parseInt(productId) } });
       if (!product) {

@@ -12,11 +12,11 @@ async function seedProducts() {
       return;
     }
 
-    const electronica = categories.find(c => c.name === 'Electrónica')?.id;
-    const ropa = categories.find(c => c.name === 'Ropa')?.id;
-    const abarrotes = categories.find(c => c.name === 'Abarrotes')?.id;
-    const ferreteria = categories.find(c => c.name === 'Ferretería')?.id;
-    const limpieza = categories.find(c => c.name === 'Limpieza')?.id;
+    const electronica = (categories as any[]).find(c => c.name === 'Electrónica')?.id;
+    const ropa = (categories as any[]).find(c => c.name === 'Ropa')?.id;
+    const abarrotes = (categories as any[]).find(c => c.name === 'Abarrotes')?.id;
+    const ferreteria = (categories as any[]).find(c => c.name === 'Ferretería')?.id;
+    const limpieza = (categories as any[]).find(c => c.name === 'Limpieza')?.id;
 
     const productosDePrueba = [
       { sku: 'ELEC001', name: 'Monitor Dell 27 Pulgadas', description: 'Monitor 4K para oficina', price: 350.00, stock: 15, minStock: 5, categoryId: electronica! },
@@ -28,43 +28,40 @@ async function seedProducts() {
 
       { sku: 'ROPA001', name: 'Camiseta Algodon Blanca', description: 'Talla M', price: 15.00, stock: 50, minStock: 10, categoryId: ropa! },
       { sku: 'ROPA002', name: 'Pantalon Mezclilla Levi', description: 'Corte recto, talla 32', price: 45.00, stock: 20, minStock: 8, categoryId: ropa! },
-      { sku: 'ROPA003', name: 'Chaqueta Cuero Negra', description: 'Estilo clásico', price: 120.00, stock: 4, minStock: 5, categoryId: ropa! },
-      { sku: 'ROPA004', name: 'Zapatos Deportivos Nike', description: 'Correr y gimnasio', price: 85.00, stock: 15, minStock: 10, categoryId: ropa! },
-      { sku: 'ROPA005', name: 'Calcetines Deportivos Pack 5', description: 'Algodón absorbente', price: 12.00, stock: 80, minStock: 30, categoryId: ropa! },
+      { sku: 'ROPA003', name: 'Chaqueta Cortavientos Nike', description: 'Ideal para correr', price: 65.00, stock: 10, minStock: 5, categoryId: ropa! },
+      { sku: 'ROPA004', name: 'Calcetines Deportivos 3 Pack', description: 'Color blanco', price: 9.99, stock: 80, minStock: 15, categoryId: ropa! },
 
-      { sku: 'ABAR001', name: 'Cafe en Grano 1KG', description: 'Tueste oscuro', price: 25.00, stock: 8, minStock: 10, categoryId: abarrotes! },
-      { sku: 'ABAR002', name: 'Aceite de Oliva Extra Virgen', description: 'Botella de vidrio 750ml', price: 12.50, stock: 40, minStock: 15, categoryId: abarrotes! },
-      { sku: 'ABAR003', name: 'Arroz Premium 5KG', description: 'Grano largo', price: 8.90, stock: 60, minStock: 20, categoryId: abarrotes! },
-      { sku: 'ABAR004', name: 'Frijol Negro 2KG', description: 'Limpio y listo para cocer', price: 6.50, stock: 45, minStock: 15, categoryId: abarrotes! },
-      { sku: 'ABAR005', name: 'Lata Atun en Agua', description: 'Pack de 6 unidades', price: 9.99, stock: 120, minStock: 40, categoryId: abarrotes! },
+      { sku: 'ABAR001', name: 'Arroz Super Extra 1KG', description: 'Grano largo', price: 1.80, stock: 200, minStock: 50, categoryId: abarrotes! },
+      { sku: 'ABAR002', name: 'Aceite de Girasol 1L', description: 'Aceite vegetal', price: 3.20, stock: 150, minStock: 30, categoryId: abarrotes! },
+      { sku: 'ABAR003', name: 'Frijoles Negros 1KG', description: 'Marca La Costeña', price: 2.10, stock: 120, minStock: 40, categoryId: abarrotes! },
+      { sku: 'ABAR004', name: 'Atun en Agua 140g', description: 'Lata de atún aleta amarilla', price: 1.15, stock: 300, minStock: 50, categoryId: abarrotes! },
+      { sku: 'ABAR005', name: 'Pasta Espagueti 500g', description: 'Semola de trigo duro', price: 0.90, stock: 180, minStock: 40, categoryId: abarrotes! },
 
-      { sku: 'FERR001', name: 'Taladro Percutor Bosch', description: '800W con estuche', price: 85.00, stock: 12, minStock: 4, categoryId: ferreteria! },
-      { sku: 'FERR002', name: 'Juego Llaves Combinadas', description: '12 piezas acero al cromo vanadio', price: 45.00, stock: 25, minStock: 10, categoryId: ferreteria! },
-      { sku: 'FERR003', name: 'Martillo Carpintero', description: 'Mango de fibra de vidrio', price: 18.50, stock: 15, minStock: 5, categoryId: ferreteria! },
-      { sku: 'FERR004', name: 'Cinta Metrica 5 Metros', description: 'Uso rudo profesional', price: 8.00, stock: 50, minStock: 20, categoryId: ferreteria! },
+      { sku: 'FERR001', name: 'Martillo de Uña 16oz', description: 'Mango de fibra de vidrio', price: 14.50, stock: 25, minStock: 5, categoryId: ferreteria! },
+      { sku: 'FERR002', name: 'Juego Destornilladores 6Pz', description: 'Puntas magneticas', price: 18.90, stock: 15, minStock: 5, categoryId: ferreteria! },
+      { sku: 'FERR003', name: 'Cinta Metrica 5 Metros', description: 'Carcasa resistente al impacto', price: 6.50, stock: 40, minStock: 10, categoryId: ferreteria! },
+      { sku: 'FERR004', name: 'Pinzas de Presion 10 Pulgadas', description: 'Acero cromo vanadio', price: 12.00, stock: 18, minStock: 5, categoryId: ferreteria! },
 
-      { sku: 'LIMP001', name: 'Detergente Industrial 5L', description: 'Uso rudo', price: 18.50, stock: 25, minStock: 5, categoryId: limpieza! },
-      { sku: 'LIMP002', name: 'Escoba Uso Exterior', description: 'Cerdas duras de plástico', price: 6.50, stock: 35, minStock: 10, categoryId: limpieza! },
-      { sku: 'LIMP003', name: 'Cloro Concentrado 10L', description: 'Para desinfección profunda', price: 22.00, stock: 18, minStock: 8, categoryId: limpieza! },
-      { sku: 'LIMP004', name: 'Bolsas Basura Grandes', description: 'Caja con 100 bolsas negras', price: 14.99, stock: 40, minStock: 15, categoryId: limpieza! },
-      { sku: 'LIMP005', name: 'Guantes de Latex Caja', description: '100 unidades talla L', price: 9.50, stock: 150, minStock: 50, categoryId: limpieza! }
+      { sku: 'LIMP001', name: 'Detergente Liquido 3L', description: 'Para ropa blanca y de color', price: 8.50, stock: 60, minStock: 15, categoryId: limpieza! },
+      { sku: 'LIMP002', name: 'Desinfectante Multiusos 1L', description: 'Aroma a pino', price: 2.30, stock: 100, minStock: 25, categoryId: limpieza! },
+      { sku: 'LIMP003', name: 'Esponjas para Trastes 3 Pack', description: 'Fibra verde y amarilla', price: 1.50, stock: 150, minStock: 30, categoryId: limpieza! },
+      { sku: 'LIMP004', name: 'Limpiador de Vidrios Gatillo 500ml', description: 'Aroma fresco sin residuos', price: 2.80, stock: 45, minStock: 10, categoryId: limpieza! }
     ];
 
-    for (const prod of productosDePrueba) {
-      if (!prod.categoryId) continue;
+    console.log(`Cargando ${productosDePrueba.length} productos...`);
 
-      const existe = await prisma.product.findUnique({ where: { sku: prod.sku } });
-      if (!existe) {
-        await prisma.product.create({ data: prod });
-        console.log(`Producto creado: ${prod.name}`);
-      } else {
-        console.log(`Producto ya existe: ${prod.name}`);
-      }
+    // Insertar productos de prueba ignorando duplicados por SKU
+    for (const prod of productosDePrueba) {
+      await prisma.product.upsert({
+        where: { sku: prod.sku },
+        update: {},
+        create: prod
+      });
     }
 
-    console.log('Productos de prueba cargados exitosamente.');
+    console.log('Productos de prueba cargados con éxito.');
   } catch (error) {
-    console.error('Error cargando productos:', error);
+    console.error('Error al insertar productos de prueba:', error);
   } finally {
     await prisma.$disconnect();
   }

@@ -1,17 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  PackageOpen, 
-  LayoutDashboard, 
   Boxes, 
   Tags, 
-  Users, 
   Truck,
-  LogOut,
-  Bell,
-  Search,
   TrendingUp,
   AlertCircle,
+  ArrowUpRight,
+  ArrowDownRight,
+  RefreshCcw,
   ClipboardList
 } from 'lucide-react';
 import axiosInstance from '../api/axios';
@@ -23,229 +20,269 @@ interface DashboardStats {
   totalProviders: number;
 }
 
+interface RecentActivity {
+  id: number;
+  type: 'IN' | 'OUT' | 'ADJUSTMENT';
+  quantity: number;
+  date: string;
+  notes: string | null;
+  product: { name: string; sku: string };
+}
+
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
-  const [userName, setUserName] = useState<string>('');
   const [stats, setStats] = useState<DashboardStats>({
     totalProducts: 0,
     lowStockProducts: 0,
     totalCategories: 0,
     totalProviders: 0
   });
+  const [recentActivities, setRecentActivities] = useState<RecentActivity[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
-  useEffect(() => {
-    // 1. Obtener la información del usuario logueado
-    const fetchUser = async () => {
-      try {
-        const res = await axiosInstance.get('/auth/me');
-        setUserName(res.data.name);
-      } catch (error) {
-        console.error('Error cargando usuario', error);
-      }
-    };
-
-    // 2. Obtener las estadísticas
-    const fetchStats = async () => {
-      try {
-        const response = await axiosInstance.get('/dashboard/stats');
-        setStats(response.data);
-      } catch (error) {
-        console.error('Error cargando estadísticas', error);
-      }
-    };
-
-    fetchUser();
-    fetchStats();
-  }, []);
-
-  const handleLogout = () => {
-    // Eliminar el token de autenticación
-    localStorage.removeItem('token');
-    // Redirigir al login
-    navigate('/login');
+  const fetchStatsAndActivity = async () => {
+    setLoading(true);
+    try {
+      const [statsRes, activityRes] = await Promise.all([
+        axiosInstance.get('/dashboard/stats'),
+        axiosInstance.get('/inventory')
+      ]);
+      setStats(statsRes.data);
+      // Solo tomamos los 5 movimientos más recientes
+      setRecentActivities(activityRes.data.slice(0, 5));
+    } catch (error) {
+      console.error('Error cargando datos del dashboard:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Función para obtener las iniciales del nombre (ej: "Juan Pérez" -> "JP")
-  const getInitials = (name: string) => {
-    if (!name) return 'AD';
-    const parts = name.trim().split(' ');
-    if (parts.length >= 2) {
-      return (parts[0][0] + parts[1][0]).toUpperCase();
-    }
-    return name.substring(0, 2).toUpperCase();
+  useEffect(() => {
+    fetchStatsAndActivity();
+  }, []);
+
+  const formatDate = (dateString: string) => {
+    const d = new Date(dateString);
+    return d.toLocaleString('es-ES', { 
+      day: '2-digit', 
+      month: 'short', 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    });
   };
 
   return (
-    <div className="flex h-screen bg-gray-50 font-sans">
+    <div className="space-y-8 animate-slide-in">
       
-      {/* Sidebar / Barra Lateral */}
-      <aside className="w-64 bg-white border-r border-gray-200 flex flex-col justify-between hidden md:flex">
+      {/* Bienvenida */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          {/* Logo */}
-          <div className="h-16 flex items-center px-6 border-b border-gray-100">
-            <div className="flex items-center gap-2 text-blue-600">
-              <PackageOpen className="w-7 h-7" />
-              <span className="text-xl font-bold text-gray-900 tracking-tight">Inventory<span className="text-blue-600">Pro</span></span>
-            </div>
-          </div>
-
-          {/* Menú de navegación */}
-          <nav className="p-4 space-y-1">
-            <button onClick={() => navigate('/dashboard')} className="w-full flex items-center gap-3 px-3 py-2.5 bg-blue-50 text-blue-700 rounded-xl font-medium transition-colors">
-              <LayoutDashboard className="w-5 h-5" /> Dashboard
-            </button>
-            <button onClick={() => navigate('/inventory')} className="w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl font-medium transition-colors">
-              <ClipboardList className="w-5 h-5" /> Inventario
-            </button>
-            <button onClick={() => navigate('/products')} className="w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl font-medium transition-colors">
-              <Boxes className="w-5 h-5" /> Productos
-            </button>
-            <button onClick={() => navigate('/categories')} className="w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl font-medium transition-colors">
-              <Tags className="w-5 h-5" /> Categorías
-            </button>
-            <button onClick={() => navigate('/providers')} className="w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl font-medium transition-colors">
-              <Truck className="w-5 h-5" /> Proveedores
-            </button>
-            <button className="w-full flex items-center gap-3 px-3 py-2.5 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl font-medium transition-colors">
-              <Users className="w-5 h-5" /> Usuarios
-            </button>
-          </nav>
+          <h2 className="text-2xl font-bold text-slate-800 tracking-tight">Bienvenido de nuevo al panel</h2>
+          <p className="text-sm text-slate-500 mt-1">Aquí tienes un resumen del estado actual de tu inventario y operaciones.</p>
         </div>
+        <button 
+          onClick={fetchStatsAndActivity}
+          className="flex items-center gap-2 px-4 py-2 border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 rounded-xl text-sm font-semibold transition-all duration-200 shadow-sm"
+        >
+          <RefreshCcw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+          Sincronizar
+        </button>
+      </div>
 
-        {/* Botón de Cerrar Sesión */}
-        <div className="p-4 border-t border-gray-100">
-          <button 
-            onClick={handleLogout}
-            className="flex items-center gap-3 px-3 py-2.5 w-full text-red-600 hover:bg-red-50 rounded-xl font-medium transition-colors group"
-          >
-            <LogOut className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-            Cerrar sesión
-          </button>
-        </div>
-      </aside>
-
-      {/* Contenido Principal */}
-      <main className="flex-1 flex flex-col overflow-hidden">
+      {/* Tarjetas de Resumen */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         
-        {/* Header Superior */}
-        <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 z-10">
-          <h1 className="text-xl font-semibold text-gray-800">Panel General</h1>
-          
-          <div className="flex items-center gap-6">
-            <div className="relative">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input 
-                type="text" 
-                placeholder="Buscar algo..." 
-                className="pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-64 transition-shadow"
-                onChange={(e) => {
-                  // Filtra cualquier caracter especial, dejando solo letras, números y espacios
-                  e.target.value = e.target.value.replace(/[^a-zA-Z0-9\s]/g, '');
-                }}
-                onKeyDown={(e) => {
-                  // Bloquear teclas de símbolos comunes para evitar que siquiera se dibujen
-                  if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(e.key)) {
-                    e.preventDefault();
-                  }
-                }}
-              />
+        {/* Tarjeta 1 - Productos */}
+        <div 
+          onClick={() => navigate('/products')} 
+          className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-slate-200/80 transition-all duration-300 cursor-pointer group"
+        >
+          <div className="flex justify-between items-start mb-4">
+            <div>
+              <p className="text-xs font-semibold tracking-wider text-slate-400 uppercase">Total Productos</p>
+              <h3 className="text-3xl font-extrabold text-slate-800 mt-1.5">{stats.totalProducts}</h3>
             </div>
-            
-            <button className="relative text-gray-500 hover:text-blue-600 transition-colors">
-              <Bell className="w-6 h-6" />
-              <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
-            </button>
-            
-            <div 
-              className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold border border-blue-200 cursor-pointer"
-              title={userName || 'Usuario'}
-            >
-              {getInitials(userName)}
+            <div className="p-3 bg-indigo-50 text-indigo-600 rounded-xl group-hover:scale-110 transition-transform">
+              <Boxes className="w-5 h-5" />
             </div>
           </div>
-        </header>
-
-        {/* Área de trabajo (Dashboard Cards) */}
-        <div className="flex-1 overflow-auto p-8">
-          
-          {/* Tarjetas de Resumen */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {/* Tarjeta 1 */}
-            <div onClick={() => navigate('/products')} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow cursor-pointer">
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Total Productos</p>
-                  <h3 className="text-3xl font-bold text-gray-900 mt-1">{stats.totalProducts}</h3>
-                </div>
-                <div className="p-3 bg-blue-50 text-blue-600 rounded-xl">
-                  <Boxes className="w-6 h-6" />
-                </div>
-              </div>
-              <div className="flex items-center text-sm">
-                <TrendingUp className="w-4 h-4 text-emerald-500 mr-1" />
-                <span className="text-emerald-500 font-medium">Actualizado</span>
-              </div>
-            </div>
-
-            {/* Tarjeta 2 */}
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Stock Bajo</p>
-                  <h3 className="text-3xl font-bold text-gray-900 mt-1">{stats.lowStockProducts}</h3>
-                </div>
-                <div className="p-3 bg-amber-50 text-amber-600 rounded-xl">
-                  <AlertCircle className="w-6 h-6" />
-                </div>
-              </div>
-              <div className="flex items-center text-sm">
-                <span className="text-amber-500 font-medium">Requieren atención</span>
-              </div>
-            </div>
-
-            {/* Tarjeta 3 */}
-            <div onClick={() => navigate('/categories')} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow cursor-pointer">
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Categorías</p>
-                  <h3 className="text-3xl font-bold text-gray-900 mt-1">{stats.totalCategories}</h3>
-                </div>
-                <div className="p-3 bg-purple-50 text-purple-600 rounded-xl">
-                  <Tags className="w-6 h-6" />
-                </div>
-              </div>
-              <div className="flex items-center text-sm">
-                <span className="text-gray-400">Organización activa</span>
-              </div>
-            </div>
-
-            {/* Tarjeta 4 */}
-            <div onClick={() => navigate('/providers')} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow cursor-pointer">
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Proveedores</p>
-                  <h3 className="text-3xl font-bold text-gray-900 mt-1">{stats.totalProviders}</h3>
-                </div>
-                <div className="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
-                  <Truck className="w-6 h-6" />
-                </div>
-              </div>
-              <div className="flex items-center text-sm">
-                <span className="text-emerald-500 font-medium">Activos</span>
-              </div>
-            </div>
+          <div className="flex items-center text-xs font-medium text-emerald-500 mt-2">
+            <TrendingUp className="w-4 h-4 mr-1" />
+            Catálogo al día
           </div>
-
-          {/* Sección de Actividad Reciente */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">Actividad Reciente</h3>
-            <div className="flex items-center justify-center h-48 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50">
-              <p className="text-gray-400 font-medium">No hay actividad reciente para mostrar por ahora.</p>
-            </div>
-          </div>
-
         </div>
-      </main>
+
+        {/* Tarjeta 2 - Stock Bajo */}
+        <div 
+          onClick={() => navigate('/inventory')}
+          className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-slate-200/80 transition-all duration-300 cursor-pointer group"
+        >
+          <div className="flex justify-between items-start mb-4">
+            <div>
+              <p className="text-xs font-semibold tracking-wider text-slate-400 uppercase">Stock Crítico</p>
+              <h3 className="text-3xl font-extrabold text-slate-800 mt-1.5">{stats.lowStockProducts}</h3>
+            </div>
+            <div className="p-3 bg-rose-50 text-rose-600 rounded-xl group-hover:scale-110 transition-transform">
+              <AlertCircle className="w-5 h-5" />
+            </div>
+          </div>
+          <div className={`flex items-center text-xs font-medium mt-2 ${stats.lowStockProducts > 0 ? 'text-rose-500' : 'text-slate-400'}`}>
+            {stats.lowStockProducts > 0 
+              ? 'Requiere reabastecimiento' 
+              : 'Todo el stock normal'}
+          </div>
+        </div>
+
+        {/* Tarjeta 3 - Categorías */}
+        <div 
+          onClick={() => navigate('/categories')} 
+          className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-slate-200/80 transition-all duration-300 cursor-pointer group"
+        >
+          <div className="flex justify-between items-start mb-4">
+            <div>
+              <p className="text-xs font-semibold tracking-wider text-slate-400 uppercase">Categorías</p>
+              <h3 className="text-3xl font-extrabold text-slate-800 mt-1.5">{stats.totalCategories}</h3>
+            </div>
+            <div className="p-3 bg-amber-50 text-amber-600 rounded-xl group-hover:scale-110 transition-transform">
+              <Tags className="w-5 h-5" />
+            </div>
+          </div>
+          <div className="flex items-center text-xs text-slate-400 mt-2 font-medium">
+            Clasificación activa
+          </div>
+        </div>
+
+        {/* Tarjeta 4 - Proveedores */}
+        <div 
+          onClick={() => navigate('/providers')} 
+          className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md hover:border-slate-200/80 transition-all duration-300 cursor-pointer group"
+        >
+          <div className="flex justify-between items-start mb-4">
+            <div>
+              <p className="text-xs font-semibold tracking-wider text-slate-400 uppercase">Proveedores</p>
+              <h3 className="text-3xl font-extrabold text-slate-800 mt-1.5">{stats.totalProviders}</h3>
+            </div>
+            <div className="p-3 bg-emerald-50 text-emerald-600 rounded-xl group-hover:scale-110 transition-transform">
+              <Truck className="w-5 h-5" />
+            </div>
+          </div>
+          <div className="flex items-center text-xs text-emerald-500 font-medium mt-2">
+            Socios comerciales activos
+          </div>
+        </div>
+
+      </div>
+
+      {/* Actividad Reciente & Accesos Rápidos */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        {/* Actividad Reciente (Kárdex Express) */}
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 lg:col-span-2">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-base font-bold text-slate-800">Últimos Movimientos</h3>
+            <button 
+              onClick={() => navigate('/inventory')}
+              className="text-xs font-semibold text-indigo-600 hover:text-indigo-700 transition-colors"
+            >
+              Ver Kárdex completo
+            </button>
+          </div>
+
+          {loading ? (
+            <div className="flex items-center justify-center h-48">
+              <div className="animate-spin rounded-full h-8 w-8 border-2 border-indigo-500 border-t-transparent"></div>
+            </div>
+          ) : recentActivities.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-48 border-2 border-dashed border-slate-100 rounded-xl bg-slate-50/50">
+              <ClipboardList className="w-8 h-8 text-slate-300 mb-2" />
+              <p className="text-xs text-slate-400 font-medium">No hay actividad reciente en el inventario.</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {recentActivities.map((activity) => (
+                <div 
+                  key={activity.id} 
+                  className="flex items-center justify-between p-3.5 hover:bg-slate-50/50 rounded-xl border border-slate-50 transition-colors"
+                >
+                  <div className="flex items-center gap-3.5 min-w-0">
+                    <div className={`p-2 rounded-xl flex-shrink-0 ${
+                      activity.type === 'IN' 
+                        ? 'bg-emerald-50 text-emerald-600' 
+                        : activity.type === 'OUT' 
+                          ? 'bg-rose-50 text-rose-600' 
+                          : 'bg-blue-50 text-blue-600'
+                    }`}>
+                      {activity.type === 'IN' ? (
+                        <ArrowUpRight className="w-4 h-4" />
+                      ) : activity.type === 'OUT' ? (
+                        <ArrowDownRight className="w-4 h-4" />
+                      ) : (
+                        <RefreshCcw className="w-4 h-4" />
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-xs font-semibold text-slate-800 truncate">{activity.product.name}</p>
+                      <p className="text-[10px] text-slate-400 font-mono mt-0.5 truncate">{activity.product.sku} • {activity.notes || 'Sin descripción'}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="text-right flex-shrink-0">
+                    <p className={`text-xs font-bold ${
+                      activity.type === 'IN' 
+                        ? 'text-emerald-600' 
+                        : activity.type === 'OUT' 
+                          ? 'text-rose-600' 
+                          : 'text-blue-600'
+                    }`}>
+                      {activity.type === 'IN' ? '+' : activity.type === 'OUT' ? '-' : ''}{activity.quantity} und
+                    </p>
+                    <p className="text-[9px] text-slate-400 mt-1">{formatDate(activity.date)}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Accesos Rápidos */}
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 flex flex-col justify-between">
+          <div>
+            <h3 className="text-base font-bold text-slate-800 mb-6">Operaciones Rápidas</h3>
+            <div className="space-y-3">
+              <button 
+                onClick={() => navigate('/inventory')} 
+                className="w-full flex items-center justify-between p-3.5 bg-slate-50/50 hover:bg-indigo-50/30 hover:text-indigo-700 rounded-xl text-xs font-semibold text-slate-700 border border-slate-100 transition-all text-left"
+              >
+                <span>Registrar movimiento de stock</span>
+                <ArrowUpRight className="w-4 h-4 text-slate-400" />
+              </button>
+              <button 
+                onClick={() => navigate('/products')} 
+                className="w-full flex items-center justify-between p-3.5 bg-slate-50/50 hover:bg-indigo-50/30 hover:text-indigo-700 rounded-xl text-xs font-semibold text-slate-700 border border-slate-100 transition-all text-left"
+              >
+                <span>Añadir nuevo producto</span>
+                <ArrowUpRight className="w-4 h-4 text-slate-400" />
+              </button>
+              <button 
+                onClick={() => navigate('/providers')} 
+                className="w-full flex items-center justify-between p-3.5 bg-slate-50/50 hover:bg-indigo-50/30 hover:text-indigo-700 rounded-xl text-xs font-semibold text-slate-700 border border-slate-100 transition-all text-left"
+              >
+                <span>Gestionar base de proveedores</span>
+                <ArrowUpRight className="w-4 h-4 text-slate-400" />
+              </button>
+            </div>
+          </div>
+
+          <div className="mt-8 p-4 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-2xl text-white text-xs relative overflow-hidden shadow-md shadow-indigo-500/10">
+            <div className="relative z-10 space-y-2">
+              <p className="font-bold text-sm">Control de Stock Crítico</p>
+              <p className="text-white/80 leading-relaxed">Configura stock mínimo en cada producto para recibir alertas inmediatas de desabastecimiento.</p>
+            </div>
+            <div className="absolute -right-8 -bottom-8 w-24 h-24 bg-white/10 rounded-full blur-xl"></div>
+          </div>
+        </div>
+
+      </div>
 
     </div>
   );
