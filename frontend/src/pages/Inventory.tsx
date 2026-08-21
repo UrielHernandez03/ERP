@@ -189,8 +189,7 @@ const Inventory: React.FC = () => {
             />
           </div>
 
-          {/* Tabla de Kárdex */}
-          <div className="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden">
+          <div className="card-premium rounded-2xl overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs border-collapse">
                 <thead className="bg-slate-50/50 text-slate-400 font-semibold tracking-wider uppercase border-b border-slate-50">
@@ -263,7 +262,7 @@ const Inventory: React.FC = () => {
         </div>
       ) : (
         /* Formulario de Transacción */
-        <div className="bg-white border border-slate-100 rounded-3xl p-6 md:p-8 max-w-xl shadow-sm">
+        <div className="card-premium rounded-3xl p-6 md:p-8 max-w-xl">
           <div className="flex items-center gap-2 mb-6">
             <Layers className="w-5 h-5 text-indigo-600" />
             <h3 className="text-sm font-bold text-slate-800">Registrar Entrada / Salida / Ajuste</h3>
@@ -384,7 +383,7 @@ const Inventory: React.FC = () => {
             <div className="pt-4 border-t border-slate-50 flex justify-end">
               <button 
                 type="submit"
-                className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-indigo-500/10 active:scale-95"
+                className="px-6 py-2.5 btn-gradient rounded-xl text-xs font-bold transition-all active:scale-95 cursor-pointer"
               >
                 Procesar Movimiento
               </button>

@@ -138,14 +138,13 @@ const Providers: React.FC = () => {
         
         <button 
           onClick={handleOpenCreateModal}
-          className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition-all shadow-md shadow-indigo-500/10 active:scale-95"
+          className="flex items-center gap-2 btn-gradient px-4 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-95 cursor-pointer"
         >
           <Plus className="w-4 h-4" /> Nuevo Proveedor
         </button>
       </div>
 
-      {/* Tabla de Proveedores */}
-      <div className="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden">
+      <div className="card-premium rounded-2xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
             <thead className="bg-slate-50/50 text-slate-400 font-semibold tracking-wider uppercase border-b border-slate-50">
@@ -271,7 +270,7 @@ const Providers: React.FC = () => {
                     placeholder="Ej. +52 5512345678"
                     className="w-full px-4 py-2.5 bg-slate-50 border border-slate-100 focus:bg-white focus:border-indigo-500 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all"
                     value={formData.phone}
-                    onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                    onChange={(e) => setFormData({...formData, phone: e.target.value.replace(/[^0-9+]/g, '')})}
                   />
                 </div>
 
@@ -283,7 +282,7 @@ const Providers: React.FC = () => {
                     placeholder="Ej. ventas@distribuidoracentral.com"
                     className="w-full px-4 py-2.5 bg-slate-50 border border-slate-100 focus:bg-white focus:border-indigo-500 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all"
                     value={formData.email}
-                    onChange={(e) => setFormData({...formData, email: e.target.value})}
+                    onChange={(e) => setFormData({...formData, email: e.target.value.replace(/[^a-zA-Z0-9@._-]/g, '')})}
                   />
                 </div>
 
@@ -295,7 +294,7 @@ const Providers: React.FC = () => {
                     rows={3}
                     className="w-full px-4 py-2.5 bg-slate-50 border border-slate-100 focus:bg-white focus:border-indigo-500 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all resize-none"
                     value={formData.address}
-                    onChange={(e) => setFormData({...formData, address: e.target.value})}
+                    onChange={(e) => setFormData({...formData, address: e.target.value.replace(/[^a-zA-Z0-9\s,.]/g, '')})}
                   />
                 </div>
 
