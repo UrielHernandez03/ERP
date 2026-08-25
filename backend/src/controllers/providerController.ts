@@ -6,6 +6,7 @@ export const getProviders = async (req: AuthRequest, res: Response): Promise<voi
   try {
     // Nota: El modelo Provider en schema.prisma no tiene campo isActive, por lo que listamos todos
     const providers = await prisma.provider.findMany({
+      where: { isActive: true },
       orderBy: { name: 'asc' }
     });
     res.json(providers);
@@ -30,7 +31,7 @@ export const createProvider = async (req: AuthRequest, res: Response): Promise<v
     }
 
     const existing = await prisma.provider.findFirst({
-      where: { name }
+      where: { name, isActive: true }
     });
 
     if (existing) {
@@ -73,6 +74,7 @@ export const updateProvider = async (req: AuthRequest, res: Response): Promise<v
     const existing = await prisma.provider.findFirst({
       where: {
         name,
+        isActive: true,
         NOT: { id: parseInt(id as string) }
       }
     });
@@ -104,17 +106,17 @@ export const deleteProvider = async (req: AuthRequest, res: Response): Promise<v
   try {
     const { id } = req.params;
 
-    // Eliminación física debido a que el modelo Provider no tiene campo isActive.
-    // Manejamos si tiene dependencias en InventoryTransaction.
-    await prisma.provider.delete({
-      where: { id: parseInt(id as string) }
+    // Eliminación lógica
+    await prisma.provider.update({
+      where: { id: parseInt(id as string) },
+      data: { isActive: false }
     });
 
     res.json({ message: 'Proveedor eliminado correctamente.' });
   } catch (error: any) {
     console.error('Error al eliminar proveedor:', error);
-    res.status(500).json({ 
-      message: 'No se puede eliminar el proveedor. Es posible que tenga transacciones de inventario asociadas.' 
+    res.status(500).json({
+      message: 'No se puede eliminar el proveedor. Es posible que tenga transacciones de inventario asociadas.'
     });
   }
 };

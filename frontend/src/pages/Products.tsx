@@ -5,7 +5,9 @@ import {
   Trash2, 
   Edit,
   AlertTriangle,
-  PackageCheck
+  PackageCheck,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import axiosInstance from '../api/axios';
 import { useToast } from '../context/ToastContext';
@@ -17,22 +19,47 @@ const Products: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [loading, setLoading] = useState(false);
+  
+  // Pagination
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const limit = 10;
   
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
+  // Debounce search
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+      if (page !== 1) setPage(1);
+    }, 400);
+    return () => clearTimeout(handler);
+  }, [searchTerm]);
+
   useEffect(() => {
     fetchProducts();
+  }, [page, debouncedSearch]);
+
+  useEffect(() => {
     fetchCategories();
   }, []);
 
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const res = await axiosInstance.get('/products');
-      setProducts(res.data);
+      const res = await axiosInstance.get(`/products?page=${page}&limit=${limit}&search=${debouncedSearch}`);
+      if (res.data && res.data.data) {
+        setProducts(res.data.data);
+        setTotalPages(res.data.totalPages);
+        setTotalItems(res.data.total);
+      } else {
+        setProducts(res.data);
+      }
     } catch (error) {
       console.error('Error fetching products:', error);
       showToast('Error al cargar la lista de productos', 'error');
@@ -96,10 +123,7 @@ const Products: React.FC = () => {
     }
   };
 
-  const filteredProducts = products.filter(p => 
-    p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    p.sku.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Removed filteredProducts as backend handles it
 
   const getStockBadge = (stock: number, minStock: number) => {
     if (stock === 0) {
@@ -146,7 +170,7 @@ const Products: React.FC = () => {
         
         <div className="flex items-center gap-2">
           <ExportButtons 
-            data={filteredProducts} 
+            data={products} 
             filename="Catalogo_Productos" 
             columns={[
               { header: 'SKU', key: 'sku' },
@@ -190,7 +214,7 @@ const Products: React.FC = () => {
                     </div>
                   </td>
                 </tr>
-              ) : filteredProducts.length === 0 ? (
+              ) : products.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-6 py-16 text-center">
                     <div className="flex flex-col items-center justify-center">
@@ -200,7 +224,7 @@ const Products: React.FC = () => {
                   </td>
                 </tr>
               ) : (
-                filteredProducts.map(product => (
+                products.map(product => (
                   <tr key={product.id} className="hover:bg-slate-50/50 transition-colors group">
                     <td className="px-6 py-4 font-mono text-slate-500 font-semibold">
                       <p className="font-bold text-slate-800">{product.sku}</p>
@@ -249,6 +273,32 @@ const Products: React.FC = () => {
             </tbody>
           </table>
         </div>
+        
+        {/* Controles de Paginación */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between px-6 py-4 border-t border-slate-50 bg-slate-50/30">
+            <span className="text-xs text-slate-500 font-medium">
+              Mostrando página <span className="font-bold text-slate-700">{page}</span> de <span className="font-bold text-slate-700">{totalPages}</span> 
+              <span className="ml-2">({totalItems} registros totales)</span>
+            </span>
+            <div className="flex gap-2">
+              <button 
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                disabled={page === 1}
+                className="p-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <button 
+                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                disabled={page === totalPages}
+                className="p-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
       </div>
 

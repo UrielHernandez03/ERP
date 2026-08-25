@@ -4,8 +4,48 @@ import { prisma } from '../prisma';
 
 export const getProducts = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
+    const { page, limit, search } = req.query;
+
+    let whereClause: any = { isActive: true };
+
+    if (search) {
+      whereClause = {
+        ...whereClause,
+        OR: [
+          { name: { contains: search as string, mode: 'insensitive' } },
+          { sku: { contains: search as string, mode: 'insensitive' } },
+          { barcode: { contains: search as string, mode: 'insensitive' } }
+        ]
+      };
+    }
+
+    if (page) {
+      const pageNum = parseInt(page as string) || 1;
+      const limitNum = parseInt(limit as string) || 10;
+      const skip = (pageNum - 1) * limitNum;
+
+      const [products, total] = await Promise.all([
+        prisma.product.findMany({
+          where: whereClause,
+          skip,
+          take: limitNum,
+          include: { category: { select: { name: true } } },
+          orderBy: { createdAt: 'desc' }
+        }),
+        prisma.product.count({ where: whereClause })
+      ]);
+
+      res.json({
+        data: products,
+        total,
+        page: pageNum,
+        totalPages: Math.ceil(total / limitNum)
+      });
+      return;
+    }
+
     const products = await prisma.product.findMany({
-      where: { isActive: true },
+      where: whereClause,
       include: {
         category: {
           select: { name: true }

@@ -141,11 +141,8 @@ const Login: React.FC = () => {
           </form>
 
           <div className="mt-6 text-center text-xs font-semibold">
-            <p className="text-slate-400">
-              ¿No tienes una cuenta?{' '}
-              <Link to="/register" className="text-indigo-400 hover:text-indigo-300 transition-colors">
-                Regístrate aquí
-              </Link>
+            <p className="text-slate-500">
+              Uso exclusivo interno. Contacta al administrador para obtener acceso.
             </p>
           </div>
         </div>

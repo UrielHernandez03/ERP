@@ -23,4 +23,17 @@ axiosInstance.interceptors.request.use(
   }
 );
 
+// Interceptor para atrapar errores 401 y 403 (token expirado o inválido)
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+      // Limpiar token y redirigir al login
+      localStorage.removeItem('token');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default axiosInstance;

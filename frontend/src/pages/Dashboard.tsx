@@ -11,6 +11,16 @@ import {
   RefreshCcw,
   ClipboardList
 } from 'lucide-react';
+import { 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer,
+  Legend
+} from 'recharts';
 import axiosInstance from '../api/axios';
 
 interface DashboardStats {
@@ -38,6 +48,7 @@ const Dashboard: React.FC = () => {
     totalProviders: 0
   });
   const [recentActivities, setRecentActivities] = useState<RecentActivity[]>([]);
+  const [chartData, setChartData] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
   const fetchStatsAndActivity = async () => {
@@ -48,8 +59,29 @@ const Dashboard: React.FC = () => {
         axiosInstance.get('/inventory')
       ]);
       setStats(statsRes.data);
-      // Solo tomamos los 5 movimientos más recientes
       setRecentActivities(activityRes.data.slice(0, 5));
+
+      // Procesar datos para la gráfica (últimos 7 días)
+      const last7Days = Array.from({ length: 7 }, (_, i) => {
+        const d = new Date();
+        d.setDate(d.getDate() - (6 - i));
+        return {
+          date: d.toISOString().split('T')[0], // YYYY-MM-DD
+          displayDate: d.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }),
+          Entradas: 0,
+          Salidas: 0
+        };
+      });
+
+      activityRes.data.forEach((tx: any) => {
+        const txDate = tx.date.split('T')[0];
+        const dayData = last7Days.find(d => d.date === txDate);
+        if (dayData) {
+          if (tx.type === 'IN') dayData.Entradas += tx.quantity;
+          if (tx.type === 'OUT') dayData.Salidas += tx.quantity;
+        }
+      });
+      setChartData(last7Days);
     } catch (error) {
       console.error('Error cargando datos del dashboard:', error);
     } finally {
@@ -173,76 +205,48 @@ const Dashboard: React.FC = () => {
 
       </div>
 
-      {/* Actividad Reciente & Accesos Rápidos */}
+      {/* Gráfica y Accesos Rápidos */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        {/* Actividad Reciente (Kárdex Express) */}
+        {/* Gráfica de Entradas vs Salidas */}
         <div className="card-premium rounded-2xl p-6 lg:col-span-2">
           <div className="flex justify-between items-center mb-6">
-            <h3 className="text-base font-bold text-slate-800">Últimos Movimientos</h3>
-            <button 
-              onClick={() => navigate('/inventory')}
-              className="text-xs font-semibold text-indigo-600 hover:text-indigo-700 transition-colors"
-            >
-              Ver Kárdex completo
-            </button>
+            <h3 className="text-base font-bold text-slate-800">Flujo de Inventario (Últimos 7 días)</h3>
           </div>
-
-          {loading ? (
-            <div className="flex items-center justify-center h-48">
-              <div className="animate-spin rounded-full h-8 w-8 border-2 border-indigo-500 border-t-transparent"></div>
-            </div>
-          ) : recentActivities.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-48 border-2 border-dashed border-slate-100 rounded-xl bg-slate-50/50">
-              <ClipboardList className="w-8 h-8 text-slate-300 mb-2" />
-              <p className="text-xs text-slate-400 font-medium">No hay actividad reciente en el inventario.</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {recentActivities.map((activity) => (
-                <div 
-                  key={activity.id} 
-                  className="flex items-center justify-between p-3.5 hover:bg-slate-50/50 rounded-xl border border-slate-50 transition-colors"
-                >
-                  <div className="flex items-center gap-3.5 min-w-0">
-                    <div className={`p-2 rounded-xl flex-shrink-0 ${
-                      activity.type === 'IN' 
-                        ? 'bg-emerald-50 text-emerald-600' 
-                        : activity.type === 'OUT' 
-                          ? 'bg-rose-50 text-rose-600' 
-                          : 'bg-blue-50 text-blue-600'
-                    }`}>
-                      {activity.type === 'IN' ? (
-                        <ArrowUpRight className="w-4 h-4" />
-                      ) : activity.type === 'OUT' ? (
-                        <ArrowDownRight className="w-4 h-4" />
-                      ) : (
-                        <RefreshCcw className="w-4 h-4" />
-                      )}
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-xs font-semibold text-slate-800 truncate">{activity.product.name}</p>
-                      <p className="text-[10px] text-slate-400 font-mono mt-0.5 truncate">{activity.product.sku} • {activity.notes || 'Sin descripción'}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="text-right flex-shrink-0">
-                    <p className={`text-xs font-bold ${
-                      activity.type === 'IN' 
-                        ? 'text-emerald-600' 
-                        : activity.type === 'OUT' 
-                          ? 'text-rose-600' 
-                          : 'text-blue-600'
-                    }`}>
-                      {activity.type === 'IN' ? '+' : activity.type === 'OUT' ? '-' : ''}{activity.quantity} und
-                    </p>
-                    <p className="text-[9px] text-slate-400 mt-1">{formatDate(activity.date)}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+          <div className="h-72 w-full">
+            {loading ? (
+              <div className="flex items-center justify-center h-full">
+                <div className="animate-spin rounded-full h-8 w-8 border-2 border-indigo-500 border-t-transparent"></div>
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                  <XAxis 
+                    dataKey="displayDate" 
+                    axisLine={false} 
+                    tickLine={false} 
+                    tick={{ fill: '#94a3b8', fontSize: 12 }} 
+                    dy={10} 
+                  />
+                  <YAxis 
+                    axisLine={false} 
+                    tickLine={false} 
+                    tick={{ fill: '#94a3b8', fontSize: 12 }} 
+                  />
+                  <Tooltip 
+                    cursor={{ fill: '#f8fafc' }}
+                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                  />
+                  <Legend iconType="circle" wrapperStyle={{ fontSize: '12px', paddingTop: '20px' }} />
+                  <Bar dataKey="Entradas" fill="#10b981" radius={[4, 4, 0, 0]} barSize={20} />
+                  <Bar dataKey="Salidas" fill="#f43f5e" radius={[4, 4, 0, 0]} barSize={20} />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
+          </div>
         </div>
+
 
         {/* Accesos Rápidos */}
         <div className="card-premium rounded-2xl p-6 flex flex-col justify-between">
@@ -282,6 +286,74 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
 
+      </div>
+
+      {/* Actividad Reciente (Kárdex Express) */}
+      <div className="card-premium rounded-2xl p-6">
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-base font-bold text-slate-800">Últimos Movimientos</h3>
+          <button 
+            onClick={() => navigate('/inventory')}
+            className="text-xs font-semibold text-indigo-600 hover:text-indigo-700 transition-colors"
+          >
+            Ver Kárdex completo
+          </button>
+        </div>
+
+        {loading ? (
+          <div className="flex items-center justify-center h-48">
+            <div className="animate-spin rounded-full h-8 w-8 border-2 border-indigo-500 border-t-transparent"></div>
+          </div>
+        ) : recentActivities.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-48 border-2 border-dashed border-slate-100 rounded-xl bg-slate-50/50">
+            <ClipboardList className="w-8 h-8 text-slate-300 mb-2" />
+            <p className="text-xs text-slate-400 font-medium">No hay actividad reciente en el inventario.</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {recentActivities.map((activity) => (
+              <div 
+                key={activity.id} 
+                className="flex items-center justify-between p-3.5 hover:bg-slate-50/50 rounded-xl border border-slate-50 transition-colors"
+              >
+                <div className="flex items-center gap-3.5 min-w-0">
+                  <div className={`p-2 rounded-xl flex-shrink-0 ${
+                    activity.type === 'IN' 
+                      ? 'bg-emerald-50 text-emerald-600' 
+                      : activity.type === 'OUT' 
+                        ? 'bg-rose-50 text-rose-600' 
+                        : 'bg-blue-50 text-blue-600'
+                  }`}>
+                    {activity.type === 'IN' ? (
+                      <ArrowUpRight className="w-4 h-4" />
+                    ) : activity.type === 'OUT' ? (
+                      <ArrowDownRight className="w-4 h-4" />
+                    ) : (
+                      <RefreshCcw className="w-4 h-4" />
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs font-semibold text-slate-800 truncate">{activity.product.name}</p>
+                    <p className="text-[10px] text-slate-400 font-mono mt-0.5 truncate">{activity.product.sku} • {activity.notes || 'Sin descripción'}</p>
+                  </div>
+                </div>
+                
+                <div className="text-right flex-shrink-0">
+                  <p className={`text-xs font-bold ${
+                    activity.type === 'IN' 
+                      ? 'text-emerald-600' 
+                      : activity.type === 'OUT' 
+                        ? 'text-rose-600' 
+                        : 'text-blue-600'
+                  }`}>
+                    {activity.type === 'IN' ? '+' : activity.type === 'OUT' ? '-' : ''}{activity.quantity} und
+                  </p>
+                  <p className="text-[9px] text-slate-400 mt-1">{formatDate(activity.date)}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
     </div>

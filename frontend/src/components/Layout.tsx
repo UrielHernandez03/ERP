@@ -12,7 +12,8 @@ import {
   Search, 
   Menu, 
   X,
-  ClipboardList
+  ClipboardList,
+  ShoppingCart
 } from 'lucide-react';
 import axiosInstance from '../api/axios';
 
@@ -85,6 +86,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   const navigationItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+    { name: 'Punto de Venta', path: '/pos', icon: ShoppingCart },
     { name: 'Inventario', path: '/inventory', icon: ClipboardList },
     { name: 'Productos', path: '/products', icon: Boxes },
     { name: 'Categorías', path: '/categories', icon: Tags },
