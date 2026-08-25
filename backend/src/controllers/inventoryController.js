@@ -31,6 +31,10 @@ const createTransaction = async (req, res) => {
             res.status(400).json({ message: 'La cantidad debe ser un número válido.' });
             return;
         }
+        if (Math.abs(qty) > 99999) {
+            res.status(400).json({ message: 'La cantidad máxima permitida es de 99999 unidades.' });
+            return;
+        }
         if (qty <= 0 && type !== 'ADJUSTMENT') {
             res.status(400).json({ message: 'La cantidad debe ser mayor a cero para entradas y salidas.' });
             return;
