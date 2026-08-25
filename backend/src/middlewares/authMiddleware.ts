@@ -25,3 +25,13 @@ export const authenticate = (req: AuthRequest, res: Response, next: NextFunction
     res.status(403).json({ message: 'Token inválido o expirado.' });
   }
 };
+
+export const authorizeRole = (roles: string[]) => {
+  return (req: AuthRequest, res: Response, next: NextFunction): void => {
+    if (!req.user || !roles.includes(req.user.role)) {
+      res.status(403).json({ message: 'No tienes permisos para realizar esta acción.' });
+      return;
+    }
+    next();
+  };
+};

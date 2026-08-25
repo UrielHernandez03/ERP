@@ -6,10 +6,12 @@ import {
   ArrowDownRight, 
   RefreshCcw, 
   ClipboardList,
-  Calendar
+  Calendar,
+  Printer
 } from 'lucide-react';
 import axiosInstance from '../api/axios';
 import { useToast } from '../context/ToastContext';
+import { generateReceipt } from '../utils/generateReceipt';
 import TransactionForm, { type Product, type Provider } from '../components/inventory/TransactionForm';
 import ExportButtons from '../components/common/ExportButtons';
 
@@ -196,6 +198,7 @@ const Inventory: React.FC = () => {
                     <th className="px-6 py-4">Cantidad</th>
                     <th className="px-6 py-4">Origen / Destino</th>
                     <th className="px-6 py-4">Notas</th>
+                    <th className="px-6 py-4 text-right">Acción</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">
@@ -247,6 +250,15 @@ const Inventory: React.FC = () => {
                         </td>
                         <td className="px-6 py-4 text-slate-500 max-w-xs truncate" title={tx.notes || ''}>
                           {tx.notes || <span className="text-slate-300">Sin notas</span>}
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <button 
+                            onClick={() => generateReceipt(tx as any)}
+                            className="p-1.5 bg-slate-50 hover:bg-indigo-50 text-slate-400 hover:text-indigo-600 rounded-lg transition-colors border border-slate-100"
+                            title="Imprimir Ticket PDF"
+                          >
+                            <Printer className="w-4 h-4" />
+                          </button>
                         </td>
                       </tr>
                     ))
